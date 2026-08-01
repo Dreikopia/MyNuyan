@@ -1,9 +1,61 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+    name: "dark";
+    default: true;
+    prefersdark: true;
+    color-scheme: dark;
+
+    /* Brand */
+    --color-primary: #FF6B5B;
+    --color-primary-content: #FFFFFF;
+
+    /* Optional - Leave as same as primary until you need another accent */
+    --color-secondary: #2E2E2E;
+    --color-secondary-content: #FFFFFF;
+
+
+    /* Layout */
+
+    --color-background: #1E1E1E;
+    --color-surface: #2E2E2E;
+    --color-surface-hover: #383838;
+
+    /* DaisyUI Base Colors */
+
+    --color-base-100: var(--color-background);
+    --color-base-200: var(--color-surface);
+    --color-base-300: var(--color-surface-hover);
+
+    /* Typography */
+
+    --color-foreground: #FFFFFF;
+    --color-muted: #B3B3B3;
+
+    --color-base-content: var(--color-foreground);
+
+
+    /* Borders */
+
+    --color-border: #444444;
+    --color-neutral: var(--color-border);
+    --color-neutral-content: var(--color-muted);
+
+    /* Status Colors */
+
+    --color-success: #22C55E;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --color-info: #3B82F6;
+
+
+    /* Radius */
+
+    --radius-box: 1rem;
+    --radius-field: 0.75rem;
+    --radius-selector: 0.75rem;
+}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}

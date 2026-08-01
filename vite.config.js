@@ -17,8 +17,16 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        host: 'mynuyan.test',
+        hmr: {
+            host: 'mynuyan.test',
+        },
         watch: {
-            ignored: ['**/storage/framework/views/**'],
+            ignored: [
+                '**/storage/framework/views/**',
+                "**/storage/**",
+                "**/vendor/**",
+            ],
         },
     },
 });
