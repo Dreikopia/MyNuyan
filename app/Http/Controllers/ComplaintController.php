@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Enums\ComplaintStatus;
@@ -53,7 +55,7 @@ class ComplaintController extends Controller
             ['label' => 'Select Category', 'url' => null],
         ];
 
-        return view('resident.complaints.create.category', compact('categories', 'breadcrumbs'));
+        return view('resident.complaints.create.category', ['categories' => $categories, 'breadcrumbs' => $breadcrumbs]);
     }
 
     /**
@@ -89,7 +91,7 @@ class ComplaintController extends Controller
             ['label' => $category->name, 'url' => null],
         ];
 
-        return view('resident.complaints.create.details', compact('category', 'breadcrumbs'));
+        return view('resident.complaints.create.details', ['category' => $category, 'breadcrumbs' => $breadcrumbs]);
     }
 
     /**
