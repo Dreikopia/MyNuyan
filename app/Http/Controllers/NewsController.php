@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
@@ -12,7 +13,9 @@ class NewsController extends Controller
      */
     public function index()
     {
-        return view('resident.news.index');
+        return view('resident.news.index', [
+            'categories' => NewsCategory::all(),
+        ]);
     }
 
     /**

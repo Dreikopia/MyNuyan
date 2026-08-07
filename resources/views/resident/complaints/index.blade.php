@@ -10,10 +10,10 @@
     </div>
 
     <div class="flex gap-2 mb-4 overflow-x-scroll">
-        <a href="{{ route('admin.complaints') }}" class="btn btn-outline rounded-full border-0 bg-primary/10">
+        <a href="{{ route('complaint.index') }}" class="btn btn-outline rounded-full">
             All
         </a>
-        @foreach (App\Enum\ComplaintStatus::cases() as $status)
+        @foreach (App\Enums\ComplaintStatus::cases() as $status)
             <a href="/complaints?status={{ $status->value }}"
                 class="btn {{ request('status') === $status->value ? '' : 'btn btn-outline rounded-full bg-base-200' }}">
                 {{ $status->label() }}

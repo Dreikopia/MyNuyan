@@ -5,7 +5,7 @@
     <div class="flex justify-between px-2 py-4">
         <div>
             <h1 class="text-xl font-bold">News & Updates</h1>
-            <p class="text-muted text-sm">Stay updated with the latest barangay news</p>
+            <p class="text-muted-foreground text-sm">Stay updated with the latest barangay news</p>
         </div>
         <div>
             <x-icons.notification />

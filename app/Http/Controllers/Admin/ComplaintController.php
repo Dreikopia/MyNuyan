@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enum\ComplaintStatus;
+use App\Enums\ComplaintStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\ComplaintCategory;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ComplaintController extends Controller
 {
@@ -36,55 +37,20 @@ class ComplaintController extends Controller
             'complaints' => $complaints,
             'categories' => $categories,
             'selectedCategory' => $categoryId,
-            'statusCounts' => Complaint::allStatusCounts(),
+            'statusCounts' => Complaint::allStatusCounts($categoryId),
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Complaint $complaint)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Complaint $complaint)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Complaint $complaint)
     {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Complaint $complaint)
-    {
-        //
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(ComplaintStatus::values())],
+            'remarks' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $complaint->update($validated);
+
+        return back()->with('success', 'Complaint updated successfully.');
     }
 }

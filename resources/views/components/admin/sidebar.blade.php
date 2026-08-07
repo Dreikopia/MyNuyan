@@ -27,7 +27,7 @@
                      <x-admin.nav-link :href="route('admin.complaints')" :active="request()->routeIs('admin.complaints')">
                          All Complaints
                      </x-admin.nav-link>
-                     <x-admin.nav-link>
+                     <x-admin.nav-link :href="route('admin.categories')" :active="request()->routeIs('admin.categories')">
                          Categories
                      </x-admin.nav-link>
                  </li>
@@ -38,7 +38,7 @@
                  <p class="text-xs text-muted-foreground">Content</p>
 
                  <li>
-                     <x-admin.nav-link>
+                     <x-admin.nav-link :href="route('admin.news')" :active="request()->routeIs('admin.news')">
                          News Article
                      </x-admin.nav-link>
                      <x-admin.nav-link>

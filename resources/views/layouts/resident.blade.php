@@ -17,7 +17,7 @@
 
 <body class="bg-background-200">
     <div class="px-4 min-h-screen">
-        <main class="pb-20">
+        <main class="pb-40">
             @yield('content')
         </main>
     </div>

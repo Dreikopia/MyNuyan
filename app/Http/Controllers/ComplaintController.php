@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enum\ComplaintStatus;
+use App\Enums\ComplaintStatus;
 use App\Models\Complaint;
 use App\Models\ComplaintCategory;
 use App\Models\ComplaintImage;
@@ -109,7 +109,6 @@ class ComplaintController extends Controller
 
         $complaint = Auth::user()->complaints()->create([
             'complaint_category_id' => $categoryId,
-
             'location' => $validated['location'],
             'description' => $validated['description'],
         ]);

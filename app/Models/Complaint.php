@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enum\ComplaintStatus;
+use App\Enums\ComplaintStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -49,9 +49,10 @@ class Complaint extends Model
             ->put('all', $user->complaints()->count());
     }
 
-    public static function allStatusCounts()
+    public static function allStatusCounts($categoryId = null)
     {
         $counts = static::query()
+            ->when($categoryId, fn ($query, $categoryId) => $query->where('complaint_category_id', $categoryId))
             ->selectRaw('status, count(*) as count')
             ->groupBy('status')
             ->pluck('count', 'status');
@@ -60,6 +61,6 @@ class Complaint extends Model
             ->mapWithKeys(fn ($status) => [
                 $status->value => $counts->get($status->value, 0),
             ])
-            ->put('all', static::count());
+            ->put('all', $counts->sum());
     }
 }

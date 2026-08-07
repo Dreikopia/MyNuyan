@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@theme {
+    /* Fonts */
+    --font-koho: 'KoHo', sans-serif;
+    --font-kopub: 'Kopub Batang', serif;
+
+    /* Custom colors — this is what makes bg-surface, text-foreground, etc. exist */
+    --color-background: #1E1E1E;
+    --color-surface: #2E2E2E;
+    --color-surface-hover: #383838;
+    --color-foreground: #FFFFFF;
+    --color-muted-foreground: rgb(255 255 255 / 0.5);
+    --color-border: #444444;
+}
+
 @plugin "daisyui/theme" {
     name: "dark";
     default: true;
@@ -11,50 +25,43 @@
     --color-primary: #FF6B5B;
     --color-primary-content: #FFFFFF;
 
-    /* Optional - Leave as same as primary until you need another accent */
     --color-secondary: #2E2E2E;
     --color-secondary-content: #FFFFFF;
 
-
-    /* Layout */
-
-    --color-background: #1E1E1E;
-    --color-surface: #2E2E2E;
-    --color-surface-hover: #383838;
-
-    /* DaisyUI Base Colors */
-
+    /* Point DaisyUI's required slots at your @theme variables */
     --color-base-100: var(--color-background);
     --color-base-200: var(--color-surface);
     --color-base-300: var(--color-surface-hover);
 
-    /* Typography */
-
-    --color-foreground: #FFFFFF;
-    --color-muted: #B3B3B3;
-
     --color-base-content: var(--color-foreground);
 
-
-    /* Borders */
-
-    --color-border: #444444;
     --color-neutral: var(--color-border);
-    --color-neutral-content: var(--color-muted);
+    --color-neutral-content: var(--color-muted-foreground);
 
     /* Status Colors */
-
     --color-success: #22C55E;
     --color-warning: #F59E0B;
     --color-error: #EF4444;
     --color-info: #3B82F6;
 
-
     /* Radius */
-
     --radius-box: 1rem;
     --radius-field: 0.75rem;
     --radius-selector: 0.75rem;
+}
+
+@font-face {
+    font-family: 'KoHo';
+    src: url('/fonts/KoHo-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Kopub Batang';
+    src: url('/fonts/KopubBatang-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
 }
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

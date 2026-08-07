@@ -3,58 +3,105 @@
 <x-resident.header />
 
 @section('content')
-    <div class="flex justify-between p-4">
-        <h2 class="text-balance pt-15 font-bold text-xl">Good day to you,<br>
-            @auth
-                {{ ucfirst(Auth::user()->first_name) }}
-            @endauth
-            @guest
-                <a href="{{ route('register') }}" class="btn btn-outlined w-fit rounded-full">
-                    Create an account
-                </a>
-            @endguest
-        </h2>
-        <div>
-            <x-icons.notification />
+    <div class="space-y-2">
+        <div class="flex justify-between items-center p-4">
+            <div>
+                <p class="font-koho text-muted-foreground">
+                    Good day to you,
+                </p>
+
+                @auth
+                    <h2 class="font-koho text-xl font-bold">
+                        {{ ucfirst(Auth::user()->first_name) }}
+                    </h2>
+                @endauth
+
+                @guest
+                    <a href="{{ route('register') }}" class="btn btn-outlined w-fit rounded-full">
+                        Create an account
+                    </a>
+                @endguest
+            </div>
+
+            <div>
+                <x-icons.notification />
+            </div>
+        </div>
+
+        @auth
+        <a href="{{ route('complaint.index') }}" class="block">
+            <div class="bg-secondary w-full card-lg rounded-xl flex items-center gap-4 p-4">
+                <div class="shrink-0">
+                    <x-icons.track />
+                </div>
+                <div>
+                    <h2 class="card-title text-md font-koho font-bold text-primary">My Complaints</h2>
+                    <p class="text-md font-koho text-muted-foreground">View and track all your complaints</p>
+                </div>
+            </div>
+        </a>
+        <div class="grid grid-cols-2 gap-2">
+            <div class="card bg-surface card-lg rounded-xl">
+                <div class="card-body">
+                    Total
+                </div>
+            </div>
+            <div class="card bg-surface card-lg rounded-xl">
+                <div class="card-body">
+                    Total
+                </div>
+            </div>
+            <div class="card bg-surface card-lg rounded-xl">
+                <div class="card-body">
+                    Total
+                </div>
+            </div>
+            <div class="card bg-surface card-lg rounded-xl">
+                <div class="card-body">
+                    Total
+                </div>
+            </div>
+        </div>
+@endauth
+
+        <div class="bg-secondary w-full card-lg rounded-xl flex flex-col items-stretch gap-4 px-4 py-6">
+            <div class="flex-1 flex items-center">
+                <h2 class="card-title text-sm font-koho font-bold">Help us to make our barangay to be a much safer,
+                    cleaner, and better place
+                </h2>
+            </div>
+            <div class="w-full">
+                @auth
+                    <a href="{{ route('complaints.create.category') }}" class="btn btn-sm btn-primary rounded-sm w-full">
+                        Submit a report
+                    </a>
+                @endauth
+                @guest
+                    <a href="{{ route('login') }}" class="btn btn-sm btn-primary rounded-sm w-full">
+                        Sign in
+                    </a>
+                @endguest
+            </div>
+        </div>
+
+        <div class="flex justify-between text-sm font-bold">
+            <h2>Discover latest news</h2>
+            <p class="text-primary">See more</p>
+        </div>
+        
+        <div class="card bg-surface w-full shadow-sm">
+            <figure>
+                <img src="images/medical-mission.webp" alt="kalbo" class="max-h-30 w-full" />
+            </figure>
+            <div class="card-body">
+                <h2 class="card-title text-primary">Health</h2>
+                <p class="text-md">Free checkup ni O-Black</p>
+            </div>
         </div>
     </div>
 
-    <div class="space-y-4">
-        <div class="bg-secondary w-full card-lg rounded-xl">
-            <div class="card-body">
-                <h2 class="card-title text-sm font-bold">Help us improve our barangay</h2>
-                <p class="text-sm">Spotted an issue? Contact us so we can solve it</p>
-                <div class="flex justify-center gap-x-2">
-                    @auth
-                        <a href="{{ route('complaint.index') }}" class="btn btn-sm btn-primary btn-outline rounded-full">
-                            View my reports
-                        </a>
-                        <a href="{{ route('complaints.create.category') }}" class="btn btn-sm btn-primary rounded-full">
-                            Submit a report
-                        </a>
-                    @endauth
-                    @guest
-                        <a href="{{ route('login') }}" class="btn btn-sm btn-primary rounded-full w-full">
-                            Sign in
-                        </a>
-                    @endguest
-                </div>
-            </div>
-        </div>
 
-        <div>
-            <div class="space-y-1 mb-2">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-bold">Discover Latest news</h2>
-                    <a href="" class="text-primary text-sm font-bold">See more</a>
-                </div>
-                <p class="text-sm">Latest news and updates for Minuyan Proper</p>
-            </div>
-            <div class="-mx-4">
-                <img src="images/medical-mission.webp" class="w-full h-50 object-cover">
-            </div>
-            <h2 class="text-primary text-lg font-bold">Community</h2>
-            <h2 class="text-xl font-bold">Free checkup ni kalbo</h2>
-        </div>
-        <x-resident.bottom-nav />
-    @endsection
+
+
+    <x-resident.bottom-nav />
+@endsection

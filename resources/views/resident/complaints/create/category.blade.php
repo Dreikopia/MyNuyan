@@ -22,8 +22,7 @@
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             @foreach ($categories as $category)
-                <label
-                    class="card bg-base-100 shadow p-4 cursor-pointer has-checked:ring-2 has-checked:ring-primary has-checked:bg-primary/5">
+                <label class="card bg-base-300 shadow p-4 cursor-pointer has-checked:bg-primary/10">
                     <input type="radio" name="complaint_category_id" value="{{ $category->id }}"
                         class="radio radio-primary mb-2 sr-only" required
                         {{ old('complaint_category_id') == $category->id ? 'checked' : '' }}>

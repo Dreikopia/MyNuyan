@@ -13,9 +13,9 @@
 
     <form method="POST" action="{{ route('login') }}" class="space-y-5">
         @csrf
-        <x-resident.field name="username" label="Username" />
+        <x-field name="username" label="Username" />
 
-        <x-resident.field name="password" label="Password" type="password" />
+        <x-field name="password" label="Password" type="password" />
 
         <button type="submit" class="btn btn-primary w-full rounded-full">
             Sign in
@@ -24,6 +24,5 @@
         <a href="{{ route('home') }}" class="block text-center font-semibold text-primary">
             Continue as Guest
         </a>
-
     </form>
 @endsection

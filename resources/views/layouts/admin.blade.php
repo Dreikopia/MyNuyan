@@ -20,13 +20,13 @@
         <x-admin.sidebar />
 
         <div class="ml-60 flex-1 flex flex-col">
-
+            {{-- 
             <header
                 class="sticky top-0 left-0 right-0 h-16 border-b border-base-300 bg-base-100 px-6 flex items-center">
                 <h1 class="text-xl font-semibold">Dashboard</h1>
-            </header>
+            </header> --}}
 
-            <main class="bg-black p-8 flex-1">
+            <main class="bg-black px-8 py-2 flex-1">
                 @yield('content')
             </main>
         </div>

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
@@ -19,8 +20,14 @@ Route::middleware('is_admin')
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints');
+        Route::patch('/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('complaints.update');
 
-        Route::get('/news', [AdminNewsController::class, 'create'])->name('news');
+        Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories');
+        Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+        Route::patch('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.delete');
+
+        Route::get('/news', [AdminNewsController::class, 'index'])->name('news');
         Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');
     });
 

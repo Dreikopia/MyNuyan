@@ -1,7 +1,7 @@
 @props(['status'])
 
 @php
-    $value = $status instanceof \App\Enum\ComplaintStatus ? $status->value : $status;
+    $value = $status instanceof \App\Enums\ComplaintStatus ? $status->value : $status;
 
     $label = match ($value) {
         'submitted' => 'Submitted',

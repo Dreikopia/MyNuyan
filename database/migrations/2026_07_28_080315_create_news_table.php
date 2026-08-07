@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Admin;
 use App\Models\NewsCategory;
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete(); // the author
-            $table->enum('type', ['news', 'announcement'])->default('news');
+            $table->foreignIdFor(Admin::class)->constrained()->cascadeOnDelete(); // the author
             $table->foreignIdFor(NewsCategory::class)->constrained()->cascadeOnDelete();
             $table->string('title');
-            $table->text('description');
             $table->string('image_path')->nullable();
+            $table->string('status')->default('draft');
+            $table->text('description');
             $table->date('date')->nullable();
             $table->timestamps();
         });

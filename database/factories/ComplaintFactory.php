@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Enum\ComplaintStatus;
+use App\Enums\ComplaintStatus;
 use App\Models\Complaint;
 use App\Models\ComplaintCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
