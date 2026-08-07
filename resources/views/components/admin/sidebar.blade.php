@@ -41,7 +41,7 @@
                      <x-admin.nav-link :href="route('admin.news')" :active="request()->routeIs('admin.news')">
                          News Article
                      </x-admin.nav-link>
-                     <x-admin.nav-link>
+                     <x-admin.nav-link :href="route('admin.news.categories')" :active="request()->routeIs('admin.news.categories')">
                          News Categories
                      </x-admin.nav-link>
                  </li>

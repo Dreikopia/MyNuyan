@@ -26,7 +26,7 @@
         @csrf
 
         <div>
-            <x-resident.field name="location" label="location" placeholder="e.g. Purok 3, near the barangay hall" />
+            <x-field name="location" label="location" placeholder="e.g. Purok 3, near the barangay hall" />
         </div>
 
         <div>

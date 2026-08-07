@@ -15,6 +15,7 @@ class NewsController extends Controller
     {
         return view('resident.news.index', [
             'categories' => NewsCategory::all(),
+            'news' => News::all(),
         ]);
     }
 

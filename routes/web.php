@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\NewsCategoryController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\HomepageController;
@@ -29,6 +30,8 @@ Route::middleware('is_admin')
 
         Route::get('/news', [AdminNewsController::class, 'index'])->name('news');
         Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');
+
+        Route::get('/news/category', [NewsCategoryController::class, 'index'])->name('news.categories');
     });
 
 Route::middleware('is_resident')
