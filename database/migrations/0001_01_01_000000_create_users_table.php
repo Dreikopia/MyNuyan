@@ -15,11 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('username');
             $table->string('phone_number');
             $table->string('password');
-            $table->string('otp_code')->nullable();
-            $table->timestamp('otp_expires_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->enum('role', ['admin', 'resident'])->default('resident');
             $table->rememberToken();

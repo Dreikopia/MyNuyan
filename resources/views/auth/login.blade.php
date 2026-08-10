@@ -13,7 +13,13 @@
 
     <form method="POST" action="{{ route('login') }}" class="space-y-5">
         @csrf
-        <x-field name="username" label="Username" />
+        <div class="join w-full">
+            <span class="join-item flex items-center border border-base-300 bg-base-200 px-3 text-base-content">
+                +63
+            </span>
+            <input type="text" name="phone_number" class="input join-item flex-1" placeholder="9123456789">
+        </div>
+        <x-error name="phone_number" />
 
         <x-field name="password" label="Password" type="password" />
 

@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Override;
 
-#[Fillable(['first_name', 'last_name', 'username', 'phone_number', 'password'])]
+#[Fillable(['first_name', 'last_name', 'phone_number', 'password'])]
 #[Hidden(['password', 'remember_token', 'otp_code'])]
 class User extends Authenticatable
 {
@@ -30,9 +30,14 @@ class User extends Authenticatable
     {
         return [
             'phone_verified_at' => 'datetime',
-            'otp_expires_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    //return if the phone verified is null and make it false if it is
+    public function isPhoneVerified(): bool
+    {
+        return ! is_null($this->phone_verified_at);
     }
 
     public function complaints()

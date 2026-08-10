@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])
         ->name('register');
-    Route::post('/register', [RegisteredUserController::class, 'store']);
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
+
+    Route::get('/register/verify-otp', [RegisteredUserController::class, 'showOtpForm'])->name('otp-form');
+    Route::post('/register/verify-otp', [RegisteredUserController::class, 'verifyOtp'])->name('otp.verify');
 
     Route::get('/login', [SessionController::class, 'create'])
         ->name('login');
-
     Route::post('/login', [SessionController::class, 'store']);
 });
 
