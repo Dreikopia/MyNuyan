@@ -62,7 +62,9 @@
             <tbody class="text-xs">
                 @forelse ($complaints as $complaint)
                     <tr>
-                        <td>{{ $complaint->id }}</td>
+                        <td>
+                            C-{{ $complaint->id }}
+                        </td>
                         <td>{{ $complaint->category->name }}</td>
                         <td class="max-w-56">
                             <p class="truncate">

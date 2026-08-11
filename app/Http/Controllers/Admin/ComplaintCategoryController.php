@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ComplaintCategory;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class ComplaintCategoryController extends Controller
 {
     public function index()
     {
@@ -53,7 +53,7 @@ class CategoryController extends Controller
             return back()->with('error', 'Cannot delete a category that has complaints assigned to it.');
         }
 
-        $category->delete();
+        $category->delete($category);
 
         return redirect()
             ->route('admin.categories')

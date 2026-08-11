@@ -9,7 +9,6 @@
                 <p class="font-koho text-muted-foreground">
                     Good day to you,
                 </p>
-
                 @auth
                     <h2 class="font-koho text-xl font-bold">
                         {{ ucfirst(Auth::user()->first_name) }}
@@ -29,40 +28,44 @@
         </div>
 
         @auth
-        <a href="{{ route('complaint.index') }}" class="block">
-            <div class="bg-secondary w-full card-lg rounded-xl flex items-center gap-4 p-4">
-                <div class="shrink-0">
-                    <x-icons.track />
+            <a href="{{ route('complaint.index') }}" class="block">
+                <div class="bg-secondary w-full card-lg rounded-xl flex items-center gap-4 p-4">
+                    <div class="shrink-0">
+                        <x-icons.track />
+                    </div>
+                    <div>
+                        <h2 class="card-title text-md font-koho font-bold text-primary">My Complaints</h2>
+                        <p class="text-md font-koho text-muted-foreground">View and track all your complaints</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="card-title text-md font-koho font-bold text-primary">My Complaints</h2>
-                    <p class="text-md font-koho text-muted-foreground">View and track all your complaints</p>
+            </a>
+            <div class="grid grid-cols-4 gap-2">
+                <div class="card bg-surface card-md rounded-xl">
+                    <div class="card-body flex flex-col justify-end items-center text-center h-full">
+                        <span class="text-2xl font-bold text-primary">24</span>
+                        <span class="text-sm text-muted-foreground">Total</span>
+                    </div>
+                </div>
+                <div class="card bg-surface card-md rounded-xl">
+                    <div class="card-body flex flex-col justify-end items-center text-center h-full">
+                        <span class="text-2xl font-bold text-primary">15</span>
+                        <span class="text-sm text-muted-foreground">Resolved</span>
+                    </div>
+                </div>
+                <div class="card bg-surface card-md rounded-xl">
+                    <div class="card-body flex flex-col justify-end items-center text-center h-full">
+                        <span class="text-2xl font-bold text-primary">6</span>
+                        <span class="text-sm text-muted-foreground">Active</span>
+                    </div>
+                </div>
+                <div class="card bg-surface card-md rounded-xl">
+                    <div class="card-body flex flex-col justify-end items-center text-center h-full">
+                        <span class="text-2xl font-bold text-primary">3</span>
+                        <span class="text-xs text-muted-foreground">Resolved</span>
+                    </div>
                 </div>
             </div>
-        </a>
-        <div class="grid grid-cols-2 gap-2">
-            <div class="card bg-surface card-lg rounded-xl">
-                <div class="card-body">
-                    Total
-                </div>
-            </div>
-            <div class="card bg-surface card-lg rounded-xl">
-                <div class="card-body">
-                    Total
-                </div>
-            </div>
-            <div class="card bg-surface card-lg rounded-xl">
-                <div class="card-body">
-                    Total
-                </div>
-            </div>
-            <div class="card bg-surface card-lg rounded-xl">
-                <div class="card-body">
-                    Total
-                </div>
-            </div>
-        </div>
-@endauth
+        @endauth
 
         <div class="bg-secondary w-full card-lg rounded-xl flex flex-col items-stretch gap-4 px-4 py-6">
             <div class="flex-1 flex items-center">
@@ -88,7 +91,7 @@
             <h2>Discover latest news</h2>
             <p class="text-primary">See more</p>
         </div>
-        
+
         <div class="card bg-surface w-full shadow-sm">
             <figure>
                 <img src="images/medical-mission.webp" alt="kalbo" class="max-h-30 w-full" />
