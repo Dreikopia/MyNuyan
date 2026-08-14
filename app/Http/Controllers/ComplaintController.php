@@ -43,9 +43,6 @@ class ComplaintController extends Controller
         ]);
     }
 
-    /**
-     * STEP 1 — Show category selection
-     */
     public function createCategory()
     {
         $categories = ComplaintCategory::all();
@@ -58,9 +55,6 @@ class ComplaintController extends Controller
         return view('resident.complaints.create.category', ['categories' => $categories, 'breadcrumbs' => $breadcrumbs]);
     }
 
-    /**
-     * STEP 1 — Store chosen category in session, move to step 2
-     */
     public function storeCategory(Request $request)
     {
         $validated = $request->validate([
@@ -72,9 +66,6 @@ class ComplaintController extends Controller
         return redirect()->route('complaints.create.details');
     }
 
-    /**
-     * STEP 2 — Show location/description/images form
-     */
     public function createDetails()
     {
         abort_unless(
@@ -94,9 +85,6 @@ class ComplaintController extends Controller
         return view('resident.complaints.create.details', ['category' => $category, 'breadcrumbs' => $breadcrumbs]);
     }
 
-    /**
-     * STEP 2 — Final submission, persist the complaint
-     */
     public function store(Request $request)
     {
         $categoryId = session('complaint.category_id');
@@ -115,6 +103,11 @@ class ComplaintController extends Controller
             'description' => $validated['description'],
         ]);
 
+        $complaint->statusHistories()->create([
+            'status' => ComplaintStatus::SUBMITTED,
+            'changed_by' => Auth::guard('admin')->id(),
+        ]);
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('complaints', 'public');
@@ -128,7 +121,6 @@ class ComplaintController extends Controller
         session()->forget('complaint.category_id');
 
         return redirect()
-            ->route('home')
-            ->with('success', 'Complaint submitted!');
+            ->route('complaint.index')->with('success', 'Complaint submitted!');
     }
 }

@@ -37,6 +37,12 @@ class Complaint extends Model
         return $this->hasMany(ComplaintImage::class);
     }
 
+    public function statusHistories()
+    {
+        return $this->hasMany(ComplaintStatusHistory::class)
+            ->latest();
+    }
+
     public static function statusCounts(User $user)
     {
         $counts = $user->complaints()

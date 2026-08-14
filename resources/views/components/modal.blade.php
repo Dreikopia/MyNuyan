@@ -1,6 +1,6 @@
 @props(['id', 'name', 'boxClass' => ''])
 
-<button {{ $attributes->merge(['class' => 'btn']) }}
+<button {{ $attributes->merge(['class' => 'btn btn-primary btn-sm rounded-sm']) }}
     onclick="document.getElementById('{{ $id }}').showModal()">
     {{ $name }}
 </button>

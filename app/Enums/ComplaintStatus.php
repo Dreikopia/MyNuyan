@@ -13,6 +13,17 @@ enum ComplaintStatus: string
     case RESOLVED = 'resolved';
     case REJECTED = 'rejected';
 
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::SUBMITTED => [self::UNDER_REVIEW, self::REJECTED],
+            self::UNDER_REVIEW => [self::IN_PROGRESS, self::REJECTED],
+            self::IN_PROGRESS => [self::PENDING_CONFIRMATION],
+            self::PENDING_CONFIRMATION => [self::RESOLVED],
+            self::RESOLVED, self::REJECTED => [], // end states, nothing after
+        };
+    }
+
     public function label(): string
     {
         return match ($this) {
@@ -23,6 +34,11 @@ enum ComplaintStatus: string
             self::RESOLVED => 'Resolved',
             self::REJECTED => 'Rejected',
         };
+    }
+
+    public function canTransitionTo(ComplaintStatus $next): bool
+    {
+        return in_array($next, $this->allowedTransitions(), true);
     }
 
     public static function values(): array

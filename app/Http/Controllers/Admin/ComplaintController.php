@@ -13,9 +13,6 @@ use Illuminate\Validation\Rule;
 
 class ComplaintController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $status = $request->status;
@@ -26,7 +23,7 @@ class ComplaintController extends Controller
 
         $categoryId = $request->category;
 
-        $complaints = Complaint::with(['category', 'user'])
+        $complaints = Complaint::with(['category', 'user', 'images'])
             ->when($status, fn ($query, $status) => $query->where('status', $status))
             ->when($categoryId, fn ($query, $categoryId) => $query->where('complaint_category_id', $categoryId))
             ->latest()
@@ -45,14 +42,31 @@ class ComplaintController extends Controller
 
     public function update(Request $request, Complaint $complaint)
     {
-
         $validated = $request->validate([
-            'status' => ['required', Rule::in(ComplaintStatus::values())],
-            'remarks' => ['nullable', 'string', 'max:1000'],
+            'status' => ['required', Rule::enum(ComplaintStatus::class)],
+            'remarks' => ['nullable', 'string'],
         ]);
 
-        $complaint->update($validated);
+        $currentStatus = $complaint->status;               // e.g. SUBMITTED
+        $newStatus = ComplaintStatus::from($validated['status']); // e.g. UNDER_REVIEW
 
-        return back()->with('success', 'Complaint updated successfully.');
+        // Step 2: Ask the enum — is this move even allowed?
+        if (! $currentStatus->canTransitionTo($newStatus)) {
+            return back()->withErrors([
+                'status' => 'That status change is not allowed.',
+            ]);
+        }
+        // Step 3: Only now do we actually save
+        $complaint->update([
+            'status' => $newStatus,
+        ]);
+
+        $complaint->statusHistories()->create([
+            'changed_by' => auth('admin')->id(),
+            'status' => $newStatus->value,
+            'remarks' => $validated['remarks'] ?? null,
+        ]);
+
+        return back()->with('success', 'Complaint status updated successfully.');
     }
 }

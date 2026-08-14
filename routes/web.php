@@ -21,6 +21,10 @@ Route::middleware('is_admin')
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints');
+
+        Route::patch('/complaints/{complaint}/review', [AdminComplaintController::class, 'review'])
+            ->name('complaints.review');
+
         Route::patch('/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('complaints.update');
 
         Route::get('/categories', [AdminComplaintCategoryController::class, 'index'])->name('categories');
