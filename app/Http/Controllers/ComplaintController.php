@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\StoreComplaint;
 use App\Enums\ComplaintStatus;
+use App\Http\Requests\StoreComplaintRequest;
 use App\Models\Complaint;
 use App\Models\ComplaintCategory;
-use App\Models\ComplaintImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class ComplaintController extends Controller
 {
@@ -36,6 +38,8 @@ class ComplaintController extends Controller
 
     public function show(Complaint $complaint)
     {
+        Gate::authorize('view', $complaint);
+
         $complaint->load('images', 'category');
 
         return view('resident.complaints.show', [
@@ -85,39 +89,16 @@ class ComplaintController extends Controller
         return view('resident.complaints.create.details', ['category' => $category, 'breadcrumbs' => $breadcrumbs]);
     }
 
-    public function store(Request $request)
+    public function store(StoreComplaintRequest $request, StoreComplaint $action)
     {
         $categoryId = session('complaint.category_id');
         abort_unless($categoryId, 400, 'No category selected.');
 
-        $validated = $request->validate([
-            'location' => 'required|string|max:255',
-            'description' => 'required|string',
-            'images' => 'nullable|array',
-            'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-        ]);
-
-        $complaint = Auth::user()->complaints()->create([
+        $action->handle([
+            ...$request->validated(),
             'complaint_category_id' => $categoryId,
-            'location' => $validated['location'],
-            'description' => $validated['description'],
         ]);
 
-        $complaint->statusHistories()->create([
-            'status' => ComplaintStatus::SUBMITTED,
-            'changed_by' => Auth::guard('admin')->id(),
-        ]);
-
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('complaints', 'public');
-
-                ComplaintImage::create([
-                    'complaint_id' => $complaint->id,
-                    'image_path' => $path,
-                ]);
-            }
-        }
         session()->forget('complaint.category_id');
 
         return redirect()

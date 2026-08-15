@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
@@ -7,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class OtpService
 {
-    public function generate(string $phone)
+    public function generate(string $phone): string
     {
         $code = (string) random_int(100000, 999999);
 

@@ -34,7 +34,7 @@ class User extends Authenticatable
         ];
     }
 
-    //return if the phone verified is null and make it false if it is
+    // return if the phone verified is null and make it false if it is
     public function isPhoneVerified(): bool
     {
         return ! is_null($this->phone_verified_at);

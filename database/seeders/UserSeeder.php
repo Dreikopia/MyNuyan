@@ -20,5 +20,13 @@ class UserSeeder extends Seeder
                 'password' => 'password',
             ]
         );
+        User::firstOrCreate(
+            ['phone_number' => '09321321321'],
+            [
+                'first_name' => 'Andrei',
+                'last_name' => 'Quintos',
+                'password' => 'password',
+            ]
+        );
     }
 }

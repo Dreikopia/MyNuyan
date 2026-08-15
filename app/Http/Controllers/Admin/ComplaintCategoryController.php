@@ -58,7 +58,7 @@ class ComplaintCategoryController extends Controller
             return back()->with('error', 'Cannot delete a category that has complaints assigned to it.');
         }
 
-        $category->delete($category);
+        $category->delete();
 
         return redirect()
             ->route('admin.categories')

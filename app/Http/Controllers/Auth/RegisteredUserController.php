@@ -37,7 +37,7 @@ class RegisteredUserController extends Controller
             'password' => $validated['password'],
         ]]);
 
-        $this->sendOtpTo($validated['phone_number'], $otpService);
+        $this->sendOtpTo($validated['phone_number']);
 
         return redirect()->route('otp-form');
     }
@@ -83,7 +83,7 @@ class RegisteredUserController extends Controller
     //     return back()->with('status', 'A new code was sent.');
     // }
 
-    private function sendOtpTo(string $phone, OtpService $otpService)
+    private function sendOtpTo(string $phone): void
     {
         $key = 'otp-request:'.$phone;
 
