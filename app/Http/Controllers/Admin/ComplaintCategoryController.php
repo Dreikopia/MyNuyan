@@ -12,8 +12,13 @@ class ComplaintCategoryController extends Controller
 {
     public function index()
     {
+
+        $categories = ComplaintCategory::withCount('complaints')
+            ->orderByDesc('complaints_count')
+            ->get();
+
         return view('admin.complaints.categories.index', [
-            'categories' => ComplaintCategory::all(),
+            'categories' => $categories,
         ]);
     }
 

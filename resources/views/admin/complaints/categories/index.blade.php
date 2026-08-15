@@ -32,13 +32,14 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach ($categories as $category)
-                <div class="card bg-base-300 hover:shadow-md transition-shadow">
+                <div class="card bg-surface hover:shadow-md transition-shadow">
                     <div class="card-body">
                         <h2 class="card-title">
                             {{ $category->name }}
+                            <span class="text-muted-foreground">{{ $category->complaints_count }}</span>
                         </h2>
-                        <div class="card-actions justify-end mt-2 gap-2">
 
+                        <div class="card-actions justify-end mt-2 gap-2">
                             <x-modal id="editCategory-{{ $category->id }}" name="Edit"
                                 class="btn btn-sm btn-outline btn-primary">
                                 <form method="POST" action="{{ route('admin.categories.update', $category) }}">
