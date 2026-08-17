@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class StoreComplaint
 {
@@ -46,7 +47,7 @@ class StoreComplaint
                         'image_path' => $path,
                     ]);
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 foreach ($storedPaths as $path) {
                     if (Storage::disk('public')->exists($path)) {
                         Storage::disk('public')->delete($path);

@@ -2,6 +2,7 @@
 
 @php
     use App\Enums\ComplaintStatus;
+    use App\Enums\ComplaintPriority;
 @endphp
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-card">
@@ -70,8 +71,18 @@
                                     class="textarea textarea-bordered w-full rows-4" placeholder="Send a remarks"
                                     label="Remarks" />
 
-                                <div x-data="{ selectedStatus: null }" class="space-y-2">
+                                <div>
+                                    <label for="priority" class="label">Priority</label>
+                                    <select name="priority" id="priority" class="select select-bordered w-full">
+                                        @foreach (ComplaintPriority::cases() as $priority)
+                                            <option value="{{ $priority->value }}" @selected(old('priority', $complaint->priority->value) === $priority->value)>
+                                                {{ $priority->label() }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
+                                <div x-data="{ selectedStatus: null }" class="space-y-2">
                                     @if ($complaint->status !== ComplaintStatus::RESOLVED && $complaint->status !== ComplaintStatus::REJECTED)
                                         <label class="label">
                                             <span class="label-text font-medium">Update Status</span>

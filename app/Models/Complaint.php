@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ComplaintPriority;
 use App\Enums\ComplaintStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,10 +17,12 @@ class Complaint extends Model
 
     protected $casts = [
         'status' => ComplaintStatus::class,
+        'priority' => ComplaintPriority::class,
     ];
 
     protected $attributes = [
         'status' => ComplaintStatus::SUBMITTED->value,
+        'priority' => ComplaintPriority::LOW->value,
     ];
 
     public function user()

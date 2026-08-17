@@ -66,7 +66,7 @@ it('cleans up uploaded images when the transaction fails after storing them', fu
     $action = new StoreComplaint($user);
     $image = UploadedFile::fake()->image('pothole.jpg');
 
-    ComplaintImage::creating(function () {
+    ComplaintImage::creating(function (): never {
         throw new RuntimeException('database failure');
     });
 
