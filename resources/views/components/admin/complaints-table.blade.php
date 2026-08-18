@@ -6,14 +6,13 @@
 @endphp
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-card">
-    <table class="table bg-base-300">
+    <table class="table table-outline border-2">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Category</th>
-                <th>Location</th>
                 <th>Description</th>
-                <th>Resident</th>
+                <th>Complainant</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -30,20 +29,21 @@
                 @endphp
                 <tr>
                     <td>
-                        C-{{ $complaint->id }}
+                        CMP-{{ $complaint->id }}
                     </td>
-                    <td>{{ $complaint->category->name }}</td>
-                    <td class="max-w-56">
-                        <p class="truncate">
-                            {{ $complaint->location }}
-                        </p>
+                    <td>
+                        {{ $complaint->category->name }}
                     </td>
+
                     <td class="max-w-56">
-                        <p class="truncate">
+                        <p class="line-clamp-2">
                             {{ $complaint->description }}
                         </p>
                     </td>
-                    <td>{{ $complaint->user->first_name }}</td>
+
+                    <td>
+                        {{ $complaint->user->first_name }}
+                    </td>
                     <td><x-status-badge :status="$complaint->status" /></td>
                     <td>
                         <x-modal id="ReviewComplaint-{{ $complaint->id }}" name="{{ $isFinal ? 'View' : 'Review' }}"
@@ -71,16 +71,20 @@
                                     class="textarea textarea-bordered w-full rows-4" placeholder="Send a remarks"
                                     label="Remarks" />
 
-                                <div>
-                                    <label for="priority" class="label">Priority</label>
-                                    <select name="priority" id="priority" class="select select-bordered w-full">
-                                        @foreach (ComplaintPriority::cases() as $priority)
-                                            <option value="{{ $priority->value }}" @selected(old('priority', $complaint->priority->value) === $priority->value)>
-                                                {{ $priority->label() }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                @unless ($isFinal)
+                                    <div>
+                                        <label for="priority-{{ $complaint->id }}" class="label">Priority</label>
+                                        <select name="priority" id="priority-{{ $complaint->id }}"
+                                            class="select select-bordered w-full">
+                                            @foreach (ComplaintPriority::cases() as $priority)
+                                                <option value="{{ $priority->value }}" @selected(old('priority', $complaint->priority->value) === $priority->value)>
+                                                    {{ $priority->label() }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endunless
+
 
                                 <div x-data="{ selectedStatus: null }" class="space-y-2">
                                     @if ($complaint->status !== ComplaintStatus::RESOLVED && $complaint->status !== ComplaintStatus::REJECTED)

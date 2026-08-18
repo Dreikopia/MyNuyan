@@ -3,8 +3,8 @@
 <div class="form-control w-full">
 
     @if ($label)
-        <div class="p-2 font-bold">
-            <label for="{{ $name }}" class="label">
+        <div class="p-2">
+            <label for="{{ $name }}" class="label text-sm">
                 <span class="label-text">
                     {{ $label }}
                 </span>

@@ -12,7 +12,6 @@
          <ul class="menu w-full gap-1 px-3">
 
              <div>
-                 <p class="text-xs text-muted-foreground">Overview</p>
                  <li>
                      <x-admin.nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                          Dashboard
@@ -21,11 +20,9 @@
              </div>
 
              <div>
-                 <p class="text-xs text-muted-foreground">Complaints</p>
-
-                 <li>
+                 <li class="space-y-1">
                      <x-admin.nav-link :href="route('admin.complaints')" :active="request()->routeIs('admin.complaints')">
-                         All Complaints
+                         Complaints
                      </x-admin.nav-link>
                      <x-admin.nav-link :href="route('admin.categories')" :active="request()->routeIs('admin.categories')">
                          Categories
@@ -35,11 +32,9 @@
 
 
              <div>
-                 <p class="text-xs text-muted-foreground">Content</p>
-
                  <li>
                      <x-admin.nav-link :href="route('admin.news')" :active="request()->routeIs('admin.news')">
-                         News Article
+                         News & Announcements
                      </x-admin.nav-link>
                      <x-admin.nav-link :href="route('admin.news.categories')" :active="request()->routeIs('admin.news.categories')">
                          News Categories
@@ -48,7 +43,6 @@
              </div>
 
              <div>
-                 <p class="text-xs text-muted-foreground">Directory</p>
                  <li>
                      <x-admin.nav-link>
                          Hotlines
@@ -57,7 +51,6 @@
              </div>
 
              <div>
-                 <p class="text-xs text-muted-foreground">Administraion</p>
                  <li>
                      <x-admin.nav-link>
                          Users

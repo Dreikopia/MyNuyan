@@ -26,7 +26,7 @@
                 <h1 class="text-xl font-semibold">Dashboard</h1>
             </header> --}}
 
-            <main class="bg-black px-8 py-2 flex-1">
+            <main class="bg-black px-4 py-2 flex-1">
                 @yield('content')
             </main>
         </div>

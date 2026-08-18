@@ -21,20 +21,25 @@ class UpdateComplaintStatus
         $newStatus = ComplaintStatus::from($attributes['status']);
         $newPriority = ComplaintPriority::from($attributes['priority']);
 
-        $statusIsChanging = $newStatus !== $complaint->status;
+        DB::transaction(function () use ($complaint, $newStatus, $newPriority, $attributes, $admin) {
+            $lockedComplaint = Complaint::query()
+                ->whereKey($complaint->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if ($statusIsChanging && ! $complaint->status->canTransitionTo($newStatus)) {
-            throw new DomainException('That status change is not allowed.');
-        }
+            $statusIsChanging = $newStatus !== $lockedComplaint->status;
 
-        DB::transaction(function () use ($complaint, $newStatus, $newPriority, $attributes, $admin, $statusIsChanging) {
-            $complaint->update([
+            if ($statusIsChanging && ! $lockedComplaint->status->canTransitionTo($newStatus)) {
+                throw new DomainException('That status change is not allowed.');
+            }
+
+            $lockedComplaint->update([
                 'status' => $newStatus,
                 'priority' => $newPriority,
             ]);
 
             if ($statusIsChanging) {
-                $complaint->statusHistories()->create([
+                $lockedComplaint->statusHistories()->create([
                     'changed_by' => $admin?->id,
                     'status' => $newStatus->value,
                     'remarks' => $attributes['remarks'] ?? null,
