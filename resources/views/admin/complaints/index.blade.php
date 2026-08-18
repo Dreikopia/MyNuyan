@@ -5,7 +5,6 @@
 
 @section('content')
     <form method="GET" action="{{ route('admin.complaints') }}" id="filter-form">
-
         <div class="flex items-center mb-4">
             <div>
                 <h1 class="text-2xl font-bold">Complaints</h1>
@@ -15,11 +14,9 @@
 
         <div class="flex items-center gap-3 mb-4">
 
-            {{-- Search --}}
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Search complaints..."
                 class="input bg-transparent input-sm w-full" onchange="this.form.submit()">
 
-            {{-- Status --}}
             <div class="dropdown">
                 <div tabindex="0" role="button"
                     class="btn btn-sm btn-outline border-base-300 font-normal justify-between w-30">
@@ -30,7 +27,7 @@
                     </svg>
                 </div>
 
-                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-40 p-2 shadow-sm">
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-45 p-2 shadow-sm">
                     <li>
                         <a href="{{ route('admin.complaints', ['category' => $selectedCategory]) }}"
                             class="{{ !request('status') ? 'active' : '' }}">
@@ -54,7 +51,6 @@
                 </ul>
             </div>
 
-            {{-- Category --}}
             <select name="category" class="select select-bordered select-sm w-44" onchange="this.form.submit()">
                 <option value="">Category: All</option>
 
@@ -67,7 +63,6 @@
             </select>
 
         </div>
-
     </form>
     <x-admin.complaints-table :complaints="$complaints" :selected-category="$selectedCategory" :status-counts="$statusCounts" :categories="$categories" />
 @endsection

@@ -25,10 +25,24 @@ class ComplaintController extends Controller
         }
 
         $categoryId = $request->category;
+        $search = $request->search;
 
         $complaints = Complaint::with(['category', 'user', 'images'])
             ->when($status, fn ($query, $status) => $query->where('status', $status))
             ->when($categoryId, fn ($query, $categoryId) => $query->where('complaint_category_id', $categoryId))
+            ->when($search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('description', 'like', "%{$search}%")
+                        ->orWhere('location', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($query) use ($search) {
+                            $query->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('category', function ($query) use ($search) {
+                            $query->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->latest()
             ->paginate(7)
             ->withQueryString();

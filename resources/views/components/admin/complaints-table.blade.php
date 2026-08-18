@@ -47,7 +47,7 @@
                     <td><x-status-badge :status="$complaint->status" /></td>
                     <td>
                         <x-modal id="ReviewComplaint-{{ $complaint->id }}" name="{{ $isFinal ? 'View' : 'Review' }}"
-                            class="btn {{ $isFinal ? 'btn-outline btn-primary' : 'btn-primary' }}" boxClass="max-w-3xl">
+                            class="btn rounded-full {{ $isFinal ? 'btn-ghost' : 'btn-primary/50' }}" boxClass="max-w-3xl">
 
                             <div class="flex items-center justify-between border-b border-base-300 pb-3 mb-4">
                                 <div>
