@@ -4,8 +4,8 @@
 @section('content')
     <div class="flex justify-between px-2 py-4">
         <div>
-            <h1 class="text-xl font-bold">News & Updates</h1>
-            <p class="text-muted-foreground text-sm">Stay updated with the latest barangay news</p>
+            <h1 class="text-xl font-bold font-kopub">News & Updates</h1>
+            <p class="text-muted-foreground text-sm font-kopub">Stay updated with the latest barangay news</p>
         </div>
         <div>
             <x-icons.notification />
@@ -18,20 +18,34 @@
         <h2 class="text-lg font-bold">Featured News</h2>
     </div>
 
-    @forelse($news as $article)
-        <div class="card bg-base-300 w-full shadow-sm">
-            <figure>
-                {{-- <img src="/images/medical-mission.webp" class="object-cover w-full" /> --}}
-            </figure>
-            <div class="card-body">
-                <h2 class="text-xl font-bold text-primary">{{ $article->category->name }}</h2>
-                <h2 class="card-title">{{ $article->title }}</h2>
-                <h2 class="card-title">{{ $article->description }}</h2>
+    <div class="space-y-5">
+        @forelse($news as $post)
+            <div class="card bg-base-300 w-full shadow-sm">
+                @if ($post->image_path)
+                    <figure>
+                        <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}"
+                            class="object-cover w-full h-48" />
+                    </figure>
+                @endif
+
+                <div class="card-body">
+                    <div class="text-xl font-bold text-primary">
+                        {{ $post->category->name }}
+                    </div>
+
+                    <h2 class="card-title">
+                        {{ $post->title }}
+                    </h2>
+
+                    <p>
+                        {{ $post->description }}
+                    </p>
+                </div>
             </div>
-        </div>
-    @empty
-        No News Nigga
-    @endforelse
+        @empty
+            <p class="text-base-content/60">No news available.</p>
+        @endforelse
+    </div>
 
     <x-resident.bottom-nav />
 @endsection

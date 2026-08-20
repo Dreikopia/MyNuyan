@@ -1,12 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-bold">Categories</h1>
-            <p class="text-sm text-base-content/60">Manage complaint categories</p>
-        </div>
-
+    <x-admin.header title="New Category" description="Manage news category">
         <x-modal id="CreateCategory" name="New Category" class="btn btn-primary">
             <form method="POST" action="{{ route('admin.categories.store') }}">
                 @csrf
@@ -22,7 +17,7 @@
                 </div>
             </form>
         </x-modal>
-    </div>
+    </x-admin.header>
 
     @if ($categories->isEmpty())
         <div class="flex flex-col items-center justify-center text-center py-16 bg-base-300 rounded-box">

@@ -75,7 +75,7 @@
             </div>
             <div class="w-full">
                 @auth
-                    <a href="{{ route('complaints.create.category') }}" class="btn btn-sm btn-primary rounded-sm w-full">
+                    <a href="{{ route('complaints.create.category') }}" class="btn btn-sm bg-primary/50 rounded-sm w-full">
                         Submit a report
                     </a>
                 @endauth

@@ -35,6 +35,11 @@ Route::middleware('is_admin')
         Route::get('/news', [AdminNewsController::class, 'index'])->name('news');
         Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');
 
+        Route::get('/news/{post}/drawer', [AdminNewsController::class, 'drawer'])->name('news.drawer');
+        Route::patch('/news/{post}', [AdminNewsController::class, 'update'])
+            ->name('news.update');
+
+        Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.delete');
         Route::get('/news/category', [NewsCategoryController::class, 'index'])->name('news.categories');
     });
 

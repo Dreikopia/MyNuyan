@@ -5,9 +5,7 @@
     @if ($label)
         <div class="p-2">
             <label for="{{ $name }}" class="label text-sm">
-                <span class="label-text">
-                    {{ $label }}
-                </span>
+                <span class="label-text">{{ $label }}</span>
             </label>
         </div>
     @endif
@@ -15,14 +13,16 @@
     @if ($type === 'select')
         <select name="{{ $name }}" id="{{ $name }}"
             {{ $attributes->merge([
-                'class' => 'select select-bordered w-full' . ($errors->has($name) ? ' select-error' : ''),
+                'class' => 'select select-bordered w-full',
+                ':class' => "{ 'select-error': errors.{$name} }",
             ]) }}>
             {{ $slot }}
         </select>
     @elseif ($type === 'textarea')
         <textarea name="{{ $name }}" id="{{ $name }}"
             {{ $attributes->merge([
-                'class' => 'textarea textarea-bordered w-full' . ($errors->has($name) ? ' textarea-error' : ''),
+                'class' => 'textarea textarea-bordered w-full',
+                ':class' => "{ 'textarea-error': errors.{$name} }",
             ]) }}>{{ old($name, $value) }}</textarea>
     @else
         <input
@@ -31,16 +31,15 @@
                 'name' => $name,
                 'id' => $name,
                 'value' => old($name, $value),
-                'class' => 'input input-bordered w-full' . ($errors->has($name) ? ' input-error' : ''),
+                'class' => 'input input-bordered w-full',
+                ':class' => "{ 'input-error': errors.{$name} }",
             ]) }}>
     @endif
 
-    @error($name)
+    <template x-if="errors.{{ $name }}">
         <label class="label">
-            <span class="label-text-alt text-error">
-                {{ $message }}
-            </span>
+            <span class="label-text-alt text-error" x-text="errors.{{ $name }}[0]"></span>
         </label>
-    @enderror
+    </template>
 
 </div>

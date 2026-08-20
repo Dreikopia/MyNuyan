@@ -44,7 +44,7 @@ class ComplaintController extends Controller
                 });
             })
             ->latest()
-            ->paginate(7)
+            ->paginate(8)
             ->withQueryString();
 
         $categories = ComplaintCategory::all();

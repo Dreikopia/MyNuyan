@@ -1,9 +1,11 @@
-@props(['id', 'name', 'boxClass' => ''])
+@props(['id', 'name' => '', 'boxClass' => '', 'trigger' => true])
 
-<button {{ $attributes->merge(['class' => 'btn btn-primary btn-sm rounded-sm']) }}
-    onclick="document.getElementById('{{ $id }}').showModal()">
-    {{ $name }}
-</button>
+@if ($trigger)
+    <button {{ $attributes->merge(['class' => 'btn btn-primary btn-sm rounded-sm']) }}
+        onclick="document.getElementById('{{ $id }}').showModal()">
+        {{ $name }}
+    </button>
+@endif
 
 <dialog id="{{ $id }}" class="modal min-h-50">
     <div @class(['modal-box', $boxClass])>

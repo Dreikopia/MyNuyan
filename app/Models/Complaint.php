@@ -74,4 +74,27 @@ class Complaint extends Model
             ])
             ->put('all', $counts->sum());
     }
+
+    // app/Models/Complaint.php
+
+    protected static function booted(): void
+    {
+        static::creating(function (Complaint $complaint) {
+            $complaint->complaint_id = self::generateComplaintId();
+        });
+    }
+
+    protected static function generateComplaintId(): string
+    {
+        $lastComplaint = self::latest('id')->first();
+
+        if ($lastComplaint) {
+            $lastNumber = (int) substr($lastComplaint->complaint_id, -3);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return 'MYN-'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+    }
 }
