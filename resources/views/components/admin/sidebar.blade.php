@@ -1,4 +1,4 @@
-<aside class="fixed inset-y-0 left-0 z-40 w-60 bg-card flex flex-col">
+<aside class="fixed inset-y-0 left-0 z-40 w-60 flex flex-col">
 
     {{-- Logo / Brand area --}}
     <div class="h-16 shrink-0 flex items-center gap-2 px-5 border-b border-base-300">
@@ -42,7 +42,7 @@
             </li>
 
             <li>
-                <x-admin.nav-link>
+                <x-admin.nav-link :href="route('admin.hotlines.index')" :active="request()->routeIs('admin.hotlines.index')">
                     Hotlines
                 </x-admin.nav-link>
             </li>

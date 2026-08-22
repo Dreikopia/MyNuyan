@@ -18,7 +18,7 @@
     $statusClasses = match ($value) {
         'submitted' => ' badge badge-soft badge-primary',
         'under_review' => 'badge badge-soft badge-info',
-        'in_progress' => 'badge badge-soft badge-bg-amber',
+        'in_progress' => 'badge badge-soft badge-warning',
         'pending_confirmation' => 'badge badge-soft badge-warning',
         'resolved' => 'badge badge-soft badge-success',
         'rejected' => 'badge badge-soft badge-error',

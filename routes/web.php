@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\AdminHotlineController;
 use App\Http\Controllers\Admin\ComplaintCategoryController as AdminComplaintCategoryController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -41,6 +42,8 @@ Route::middleware('is_admin')
 
         Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.delete');
         Route::get('/news/category', [NewsCategoryController::class, 'index'])->name('news.categories');
+
+        Route::get('/hotlines', [AdminHotlineController::class, 'index'])->name('hotlines.index');
     });
 
 Route::middleware('is_resident')

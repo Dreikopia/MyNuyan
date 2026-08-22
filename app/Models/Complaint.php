@@ -95,6 +95,6 @@ class Complaint extends Model
             $nextNumber = 1;
         }
 
-        return 'MYN-'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+        return '#'.str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
     }
 }

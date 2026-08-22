@@ -5,12 +5,41 @@
         <x-admin.news-modal :categories="$categories" />
     </x-admin.header>
 
+    <div class="flex items-center justify-end pb-2" x-data>
 
-    <div class="py-4">
-        <div>
+        <form method="GET" action="{{ route('admin.news') }}" @input.debounce.300ms="$el.submit()"
+            class="flex items-center gap-2">
+
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.news', request()->except('status')) }}"
+                    class="btn btn-xs {{ !request('status') ? 'btn-primary' : 'btn-outline' }}">
+                    All
+                </a>
+
+                <a href="{{ route('admin.news', array_merge(request()->query(), ['status' => 'published'])) }}"
+                    class="btn btn-xs {{ request('status') === 'published' ? 'btn-primary' : 'btn-outline' }}">
+                    Published
+                </a>
+
+                <a href="{{ route('admin.news', array_merge(request()->query(), ['status' => 'draft'])) }}"
+                    class="btn btn-xs {{ request('status') === 'draft' ? 'btn-primary' : 'btn-outline' }}">
+                    Draft
+                </a>
+            </div>
+            {{-- Search --}}
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Search news and announcements"
-                class="input input-sm bg-surface w-full" onchange="this.form.submit()">
-        </div>
+                class="input input-sm bg-surface w-120">
+
+            <select name="category" class="select select-sm bg-surface w-auto" @change="$el.form.submit()">
+                <option value="" class="text-sm">All</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}" @selected(request('category') == $category->id)>
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
+
+        </form>
     </div>
 
 
@@ -37,72 +66,63 @@
                 this.loading = false;
             }
         }
-    }" class="columns-1 md:columns-2 lg:columns-3 gap-4">
-
-
-
+    }" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
 
         @foreach ($news as $post)
-            <div class="card bg-base-100 w-full mb-3 break-inside-avoid overflow-hidden shadow-sm cursor-pointer hover:shadow-xl transition"
+            <div class="card bg-base-100 shadow-sm cursor-pointer hover:shadow-xl transition"
                 @click="openDrawer('{{ route('admin.news.drawer', $post) }}')">
 
-                {{-- Image --}}
-                @if ($post->image_path)
-                    <figure>
-                        <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}"
-                            class="w-full h-42 object-cover">
-                    </figure>
-                @endif
-
-                {{-- Content --}}
                 <div class="card-body p-4">
-
-                    {{-- Title --}}
-                    <h2 class="card-title">
-                        {{ $post->title }}
-                    </h2>
-
-                    {{-- Category --}}
-                    <div class="badge bg-primary/50">
-                        {{ $post->category->name }}
+                    <div class="flex justify-between">
+                        <div>
+                            <p class="font-koho text-muted-foreground">
+                                {{ ucfirst($post->status->value) }}
+                            </p>
+                        </div>
+                        <div class="badge badge-sm bg-primary/50">
+                            {{ $post->category->name }}
+                        </div>
                     </div>
 
-                    {{-- Description --}}
-                    <p>
-                        {{ $post->description }}
-                    </p>
 
+                    <h2 class="card-title text-base">
+                        {{ $post->title }}
+                    </h2>
+                    <p class="text-xs text-base-content/60">
+                        {{ \Carbon\Carbon::parse($post->date)->format('F j, Y') }}
+                    </p>
+                    @if ($post->image_path)
+                        <p class="text-xs text-muted-foreground">
+                            With image
+                        </p>
+                    @else
+                        <p class="text-xs text-muted-foreground">
+                            No image
+                        </p>
+                    @endif
                 </div>
             </div>
         @endforeach
 
 
-        {{-- Drawer --}}
         <div class="drawer drawer-end">
 
             <input type="checkbox" class="drawer-toggle" x-model="open" />
-
             <div class="drawer-side z-50">
 
-                {{-- Overlay --}}
                 <label @click="open = false" class="drawer-overlay"></label>
-
-                {{-- Drawer Panel --}}
                 <div x-ref="drawerPanel" class="bg-base-100 min-h-full w-full max-w-xl lg:max-w-2xl flex flex-col">
-
-                    {{-- Loading --}}
                     <template x-if="loading">
                         <div class="flex flex-1 justify-center items-center">
-                            <span class="loading loading-spinner text-primary"></span>
+                            <span class="loading loading-spinner text-primary">
+                                Loading
+                            </span>
                         </div>
                     </template>
 
-                    {{-- Content --}}
                     <div x-show="!loading" x-html="content" class="flex-1"></div>
-
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

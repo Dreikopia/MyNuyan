@@ -13,47 +13,55 @@ use App\Models\ComplaintCategory;
 use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ComplaintController extends Controller
 {
     public function index(Request $request)
     {
-        $status = $request->status;
+        $complaints = QueryBuilder::for(Complaint::class)
+            ->allowedFilters(
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('complaint_category_id'),
+                AllowedFilter::exact('priority'),
 
-        if (! in_array($status, ComplaintStatus::values())) {
-            $status = null;
-        }
-
-        $categoryId = $request->category;
-        $search = $request->search;
-
-        $complaints = Complaint::with(['category', 'user', 'images'])
-            ->when($status, fn ($query, $status) => $query->where('status', $status))
-            ->when($categoryId, fn ($query, $categoryId) => $query->where('complaint_category_id', $categoryId))
-            ->when($search, function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('description', 'like', "%{$search}%")
-                        ->orWhere('location', 'like', "%{$search}%")
-                        ->orWhereHas('user', function ($query) use ($search) {
-                            $query->where('first_name', 'like', "%{$search}%")
-                                ->orWhere('last_name', 'like', "%{$search}%");
-                        })
-                        ->orWhereHas('category', function ($query) use ($search) {
-                            $query->where('name', 'like', "%{$search}%");
-                        });
-                });
-            })
-            ->latest()
-            ->paginate(8)
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('description', 'like', "%{$value}%")
+                            ->orWhere('location', 'like', "%{$value}%")
+                            ->orWhereHas('user', function ($q) use ($value) {
+                                $q->where('first_name', 'like', "%{$value}%")
+                                    ->orWhere('last_name', 'like', "%{$value}%");
+                            })
+                            ->orWhereHas('category', function ($q) use ($value) {
+                                $q->where('name', 'like', "%{$value}%");
+                            });
+                    });
+                }),
+            )
+            ->with(['category', 'user', 'images'])
+            ->defaultSort('-created_at')
+            ->paginate(10)
             ->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.complaints._table', [
+                    'complaints' => $complaints,
+                ])->render(),
+            ]);
+        }
+
         $categories = ComplaintCategory::all();
+
+        $selectedCategory = $request->input('filter.complaint_category_id');
 
         return view('admin.complaints.index', [
             'complaints' => $complaints,
             'categories' => $categories,
-            'selectedCategory' => $categoryId,
-            'statusCounts' => Complaint::allStatusCounts($categoryId),
+            'selectedCategory' => $selectedCategory,
+            'statusCounts' => Complaint::allStatusCounts($selectedCategory),
         ]);
     }
 
