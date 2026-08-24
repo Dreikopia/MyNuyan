@@ -2,13 +2,9 @@
 
     {{-- Logo / Brand area --}}
     <div class="h-16 shrink-0 flex items-center gap-2 px-5 border-b border-base-300">
-        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span class="text-primary-content font-bold text-xs">M</span>
-        </div>
-
-        <span class="text-foreground font-semibold text-lg">
-            Mynuyan
-        </span>
+        <p class="text-foreground font-semibold text-lg font-kopub">
+            <span class="text-primary">My</span>nuyan
+        </p>
     </div>
 
     {{-- Navigation --}}

@@ -49,8 +49,7 @@
                         </svg>
                     </div>
 
-                    <ul tabindex="0"
-                        class="dropdown-content menu bg-base-100 rounded-box z-[100] w-48 p-2 mt-1 shadow-lg">
+                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-100 w-48 p-2 mt-1 shadow-lg">
                         <li>
                             <a
                                 href="{{ route('admin.complaints', [
@@ -88,11 +87,9 @@
                     </ul>
                 </div>
 
-                {{-- Category --}}
                 <select name="filter[complaint_category_id]" class="select select-bordered select-sm w-40"
                     onchange="this.form.submit()">
-                    <option value="">Category: All</option>
-
+                    <option value="">Category:All</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}" @selected((string) $selectedCategory === (string) $category->id)>
                             {{ $category->name }}
@@ -100,10 +97,8 @@
                     @endforeach
                 </select>
 
-                {{-- Priority --}}
                 <select name="filter[priority]" class="select select-bordered select-sm w-40" onchange="this.form.submit()">
                     <option value="">Priority: All</option>
-
                     @foreach (ComplaintPriority::cases() as $priority)
                         <option value="{{ $priority->value }}" @selected(request('filter.priority') === $priority->value)>
                             {{ $priority->label() }}

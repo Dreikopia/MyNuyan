@@ -35,4 +35,9 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(News::class);
     }
+
+    public function hotlines()
+    {
+        return $this->hasMany(Hotline::class);
+    }
 }

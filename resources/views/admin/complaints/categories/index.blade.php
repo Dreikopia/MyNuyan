@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-    <x-admin.header title="Complaint Categories">
+    <x-admin.header title="Complaint ">
         <x-modal id="CreateCategory" name="New Category" class="btn btn-primary">
             <form method="POST" action="{{ route('admin.categories.store') }}">
                 @csrf

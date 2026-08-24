@@ -4,9 +4,8 @@
 @endphp
 
 <table class="table table-md bg-background">
-    {{-- sticky header: stays visible while you scroll a long list --}}
     <thead class="sticky top-0 z-10 bg-surface text-base-content/70 uppercase text-[11px] tracking-wide">
-        <tr class="divide-x divide-base-300">
+        <tr>
             <th>Id</th>
             <th>Category</th>
             <th>Location</th>
@@ -22,12 +21,15 @@
             @php
                 $isFinal = in_array($complaint->status, [ComplaintStatus::RESOLVED, ComplaintStatus::REJECTED], true);
             @endphp
-            <tr class="divide-x divide-base-300 hover:bg-base-200/60 transition-colors">
+            <tr class="hover:bg-base-200/60 transition-colors">
                 <td class="font-medium">
                     {{ $complaint->complaint_id }}
                 </td>
-                <td>
-                    {{ $complaint->category->name }}
+                <td class="max-w-50">
+                    <p class="font-bold"> {{ $complaint->category->name }}</p>
+                    <span class="text-xs text-muted-foreground line-clamp-1">
+                        {{ $complaint->description }}
+                    </span>
                 </td>
                 <td class="max-w-30">
                     <p class="line-clamp-1 text-xs">
@@ -36,24 +38,24 @@
                 </td>
 
                 <td class="whitespace-nowrap text-base-content/70">
-                    {{ $complaint->created_at->format('M d') }}
+                    {{ $complaint->created_at->diffForHumans() }}
                 </td>
                 <td class="px-4 py-3">
                     <x-priority-badge :priority="$complaint->priority" />
                 </td>
-                <td class="max-w-35">
+                <td class="max-w-40">
                     <x-status-badge :status="$complaint->status" />
                 </td>
 
                 {{-- ...everything from here down is identical to what you already had... --}}
                 <td>
                     @if (!$isFinal)
-                        <label for="complaint-drawer-{{ $complaint->id }}" class="btn btn-xs bg-primary/10">
+                        <label for="complaint-drawer-{{ $complaint->id }}" class="btn btn-sm bg-primary/50">
                             Review
                         </label>
                     @else
                         <div class="flex items-center gap-6">
-                            <label for="complaint-drawer-{{ $complaint->id }}" class="btn btn-sm bg-primary">
+                            <label for="complaint-drawer-{{ $complaint->id }}" class="btn btn-sm bg-primary/50">
                                 Review
                             </label>
                             <span>
@@ -75,7 +77,7 @@
                             <div class="flex items-center justify-between border-b border-base-300 p-6 pb-3">
                                 <div>
                                     <h3 class="text-lg font-bold">
-                                        # {{ $complaint->complaint_id }}
+                                        {{ $complaint->complaint_id }}
                                     </h3>
 
                                     </p>
