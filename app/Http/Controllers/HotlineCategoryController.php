@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\HotlineCategory;
@@ -10,7 +12,7 @@ class HotlineCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): void
     {
         //
     }
@@ -18,7 +20,7 @@ class HotlineCategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -26,7 +28,7 @@ class HotlineCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
         //
     }
@@ -34,7 +36,7 @@ class HotlineCategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(HotlineCategory $hotlineCategory)
+    public function show(HotlineCategory $hotlineCategory): void
     {
         //
     }
@@ -42,7 +44,7 @@ class HotlineCategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(HotlineCategory $hotlineCategory)
+    public function edit(HotlineCategory $hotlineCategory): void
     {
         //
     }
@@ -50,7 +52,7 @@ class HotlineCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, HotlineCategory $hotlineCategory)
+    public function update(Request $request, HotlineCategory $hotlineCategory): void
     {
         //
     }
@@ -58,7 +60,7 @@ class HotlineCategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(HotlineCategory $hotlineCategory)
+    public function destroy(HotlineCategory $hotlineCategory): void
     {
         //
     }

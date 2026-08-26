@@ -8,10 +8,12 @@
 @endphp
 
 @section('content')
-    <x-admin.header title="Complaints" description="Manage and review complaints">
-        <button class="btn btn-sm btn-primary">
-            Archives
-        </button>
+    <x-admin.header title="Complaints">
+        <x-button class="btn bg-fuchsia-700 rounded-t-xl rounded-bl-xl rounded-br-none"
+            href="{{ route('admin.categories') }}">
+            Manage Categories
+        </x-button>
+        <x-icons.notifications />
     </x-admin.header>
 
     <div x-data="{
@@ -30,13 +32,11 @@
     }">
 
         <form method="GET" action="{{ route('admin.complaints') }}" id="filter-form">
-            <div class="flex items-center gap-3 pb-2">
+            <div class="flex items-center gap-3 py-4">
 
-                {{-- Search --}}
                 <input type="text" x-model="search" x-on:input.debounce.400ms="fetchResults()" autocomplete="off"
                     class="input input-sm bg-transparent w-64" placeholder="Search complaints...">
 
-                {{-- Status --}}
                 <div class="dropdown">
                     <div tabindex="0" role="button" class="btn btn-sm btn-outline font-normal justify-between w-36">
                         <span>
@@ -106,8 +106,14 @@
                     @endforeach
                 </select>
 
+
+                <a href="{{ route('admin.complaints.archived') }}" class="btn btn-sm btn-outline">
+                    <x-icons.archive class="w-4 h-4" />
+                    View Archived
+                </a>
             </div>
         </form>
+
         <div class="overflow-x-auto border border-base-content/5 bg-surface rounded-md shadow-sm">
             <div id="complaints-table">
                 @include('admin.complaints._table')

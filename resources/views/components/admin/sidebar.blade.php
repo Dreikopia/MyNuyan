@@ -1,4 +1,4 @@
-<aside class="fixed inset-y-0 left-0 z-40 w-60 flex flex-col">
+<aside class="fixed inset-y-0 left-0 z-40 w-60 flex flex-col bg-surface">
 
     {{-- Logo / Brand area --}}
     <div class="h-16 shrink-0 flex items-center gap-2 px-5 border-b border-base-300">
@@ -21,10 +21,6 @@
                 <x-admin.nav-link :href="route('admin.complaints')" :active="request()->routeIs('admin.complaints')">
                     Complaints
                 </x-admin.nav-link>
-
-                <x-admin.nav-link :href="route('admin.categories')" :active="request()->routeIs('admin.categories')">
-                    Categories
-                </x-admin.nav-link>
             </li>
 
             <li>
@@ -45,7 +41,7 @@
 
             <li>
                 <x-admin.nav-link>
-                    Users
+                    Accounts
                 </x-admin.nav-link>
             </li>
 

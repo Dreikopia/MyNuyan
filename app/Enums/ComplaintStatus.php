@@ -9,7 +9,6 @@ enum ComplaintStatus: string
     case SUBMITTED = 'submitted';
     case UNDER_REVIEW = 'under_review';
     case IN_PROGRESS = 'in_progress';
-    case PENDING_CONFIRMATION = 'pending_confirmation';
     case RESOLVED = 'resolved';
     case REJECTED = 'rejected';
 
@@ -18,8 +17,7 @@ enum ComplaintStatus: string
         return match ($this) {
             self::SUBMITTED => [self::UNDER_REVIEW, self::REJECTED],
             self::UNDER_REVIEW => [self::IN_PROGRESS, self::REJECTED],
-            self::IN_PROGRESS => [self::PENDING_CONFIRMATION],
-            self::PENDING_CONFIRMATION => [self::RESOLVED],
+            self::IN_PROGRESS => [self::RESOLVED],
             self::RESOLVED, self::REJECTED => [], // end states, nothing after
         };
     }
@@ -30,7 +28,6 @@ enum ComplaintStatus: string
             self::SUBMITTED => 'Submitted',
             self::UNDER_REVIEW => 'Under Review',
             self::IN_PROGRESS => 'In Progress',
-            self::PENDING_CONFIRMATION => 'Pending Confirmation',
             self::RESOLVED => 'Resolved',
             self::REJECTED => 'Rejected',
         };

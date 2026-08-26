@@ -8,6 +8,7 @@ use App\Enums\ComplaintPriority;
 use App\Enums\ComplaintStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Override;
 
 class Complaint extends Model
 {
@@ -46,6 +47,16 @@ class Complaint extends Model
             ->latest();
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('is_archived', false);
+    }
+
+    public function scopeArchived($query)
+    {
+        return $query->where('is_archived', true);
+    }
+
     public static function statusCounts(User $user)
     {
         $counts = $user->complaints()
@@ -77,6 +88,7 @@ class Complaint extends Model
 
     // app/Models/Complaint.php
 
+    #[Override]
     protected static function booted(): void
     {
         static::creating(function (Complaint $complaint) {
@@ -89,7 +101,7 @@ class Complaint extends Model
         $lastComplaint = self::latest('id')->first();
 
         if ($lastComplaint) {
-            $lastNumber = (int) substr($lastComplaint->complaint_id, -3);
+            $lastNumber = (int) substr((string) $lastComplaint->complaint_id, -3);
             $nextNumber = $lastNumber + 1;
         } else {
             $nextNumber = 1;

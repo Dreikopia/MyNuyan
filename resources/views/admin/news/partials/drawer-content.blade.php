@@ -14,7 +14,7 @@
 
         <button type="button" onclick="document.getElementById('EditNews{{ $post->id }}').showModal()"
             class="btn btn-ghost btn-square btn-sm" aria-label="Edit">
-            <x-icons.pen />
+            <x-icons.edit />
         </button>
 
         <x-modal id="DeleteNews{{ $post->id }}" name="Delete" boxClass="max-w-sm"

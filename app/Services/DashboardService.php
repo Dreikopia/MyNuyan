@@ -25,9 +25,7 @@ class DashboardService
             ->orderBy('year')
             ->orderBy('month')
             ->get()
-            ->keyBy(function ($item) {
-                return $item->year.'-'.$item->month;
-            });
+            ->keyBy(fn ($item) => $item->year.'-'.$item->month);
 
         $months = collect();
 
@@ -52,11 +50,9 @@ class DashboardService
             ->selectRaw('complaint_category_id, COUNT(*) as total')
             ->groupBy('complaint_category_id')
             ->get()
-            ->map(function ($complaint) {
-                return [
-                    'category' => $complaint->category->name,
-                    'total' => $complaint->total,
-                ];
-            });
+            ->map(fn ($complaint) => [
+                'category' => $complaint->category->name,
+                'total' => $complaint->total,
+            ]);
     }
 }

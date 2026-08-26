@@ -13,21 +13,21 @@
         default => ucfirst(str_replace('_', ' ', $value)),
     };
 
-    $baseClasses = 'badge badge-soft badge badge badge-soft badge-sm font-medium whitespace-nowrap rounded-2xl';
+    $baseClasses = 'badge badge-soft badge-sm font-medium whitespace-nowrap rounded-full';
 
     $statusClasses = match ($value) {
-        'submitted' => ' badge badge-soft badge-primary',
-        'under_review' => 'badge badge-soft badge-info',
-        'in_progress' => 'badge badge-soft badge-warning',
-        'pending_confirmation' => 'badge badge-soft badge-warning',
-        'resolved' => 'badge badge-soft badge-success',
-        'rejected' => 'badge badge-soft badge-error',
-        default => 'badge badge-soft badge-ghost',
+        'submitted' => 'badge-primary',
+        'under_review' => 'badge-info',
+        'in_progress' => 'badge-warning',
+        'pending_confirmation' => 'badge-warning',
+        'resolved' => 'badge-success',
+        'rejected' => 'badge-error',
+        default => 'badge-ghost',
     };
-
-    $classes = "$baseClasses $statusClasses";
 @endphp
 
-<span {{ $attributes->merge(['class' => $classes]) }}>
+<span {{ $attributes->merge([
+    'class' => "$baseClasses $statusClasses",
+]) }}>
     {{ $label }}
 </span>

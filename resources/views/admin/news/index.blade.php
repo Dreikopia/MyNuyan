@@ -69,7 +69,7 @@
     }" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
 
         @foreach ($news as $post)
-            <div class="card bg-base-100 shadow-sm cursor-pointer hover:shadow-xl transition"
+            <div class="card bg-surface shadow-sm cursor-pointer hover:shadow-xl transition"
                 @click="openDrawer('{{ route('admin.news.drawer', $post) }}')">
 
                 <div class="card-body p-4">

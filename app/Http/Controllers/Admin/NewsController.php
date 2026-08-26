@@ -102,7 +102,7 @@ class NewsController extends Controller
             Storage::disk('public')->delete($news->image_path);
         }
 
-        $news->delete($news);
+        $news->delete();
 
         return redirect()
             ->route('admin.news')

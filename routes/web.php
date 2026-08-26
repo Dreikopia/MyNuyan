@@ -22,16 +22,25 @@ Route::middleware('is_admin')
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints');
-
         Route::patch('/complaints/{complaint}/review', [AdminComplaintController::class, 'review'])
             ->name('complaints.review');
-
         Route::patch('/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('complaints.update');
+
+        Route::get('/complaints/archived', [AdminComplaintController::class, 'archived'])->name('complaints.archived');
+
+        Route::patch('/complaints/{complaint}/archive', [AdminComplaintController::class, 'archive'])->name('complaints.archive');
+        Route::patch('/complaints/{complaint}/unarchive', [AdminComplaintController::class, 'unArchive'])->name('complaints.unarchive');
 
         Route::get('/categories', [AdminComplaintCategoryController::class, 'index'])->name('categories');
         Route::post('/categories', [AdminComplaintCategoryController::class, 'store'])->name('categories.store');
+
+        Route::get('/categories/archived', [AdminComplaintCategoryController::class, 'archived'])->name('categories.archived');
+
+        Route::patch('/categories/{categories}/archive', [AdminComplaintCategoryController::class, 'archive'])->name('categories.archive');
+        Route::patch('/categories/{categories}/unarchive', [AdminComplaintCategoryController::class, 'unArchive'])->name('categories.unarchive');
+
         Route::patch('/categories/{category}', [AdminComplaintCategoryController::class, 'update'])->name('categories.update');
-        Route::delete('/categories/{category}', [AdminComplaintCategoryController::class, 'destroy'])->name('categories.delete');
+        Route::delete('/categories/{category}', [AdminComplaintCategoryController::class, 'destroy'])->name('categories.destroy');
 
         Route::get('/news', [AdminNewsController::class, 'index'])->name('news');
         Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');

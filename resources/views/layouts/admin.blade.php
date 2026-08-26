@@ -20,12 +20,12 @@
         <x-admin.sidebar />
 
         <div class="ml-60 flex-1 flex flex-col">
-
             <main class="bg-black px-4 pt-18 flex-1">
                 @yield('content')
             </main>
         </div>
     </div>
+    <x-admin.toast />
 </body>
 
 
