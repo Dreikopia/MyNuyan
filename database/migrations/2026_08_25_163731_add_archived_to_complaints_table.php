@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('complaints', function (Blueprint $table) {
             $table->boolean('is_archived')->default(false);
+            $table->timestamp('archived_at')->nullable();
         });
     }
 

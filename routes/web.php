@@ -28,6 +28,7 @@ Route::middleware('is_admin')
 
         Route::get('/complaints/archived', [AdminComplaintController::class, 'archived'])->name('complaints.archived');
 
+        // this route is redundant for now i'm keeping these for possible reopened features or whatever
         Route::patch('/complaints/{complaint}/archive', [AdminComplaintController::class, 'archive'])->name('complaints.archive');
         Route::patch('/complaints/{complaint}/unarchive', [AdminComplaintController::class, 'unArchive'])->name('complaints.unarchive');
 

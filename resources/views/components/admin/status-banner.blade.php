@@ -5,8 +5,6 @@
         moved to In Progress.</span>
     <span x-show="selectedStatus === 'rejected'">This complaint will be
         rejected.</span>
-    <span x-show="selectedStatus === 'pending_confirmation'">Complaint will be
-        marked as Pending Confirmation.</span>
     <span x-show="selectedStatus === 'resolved'">Complaint will be marked as
         Resolved.</span>
 </div>

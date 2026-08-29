@@ -39,29 +39,29 @@
                     </div>
                 </div>
             </a>
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 gap-2">
                 <div class="card bg-surface card-md rounded-xl">
                     <div class="card-body flex flex-col justify-end items-center text-center h-full">
-                        <span class="text-2xl font-bold text-primary">24</span>
+                        <span class="text-2xl font-bold text-primary"></span>
                         <span class="text-sm text-muted-foreground">Total</span>
                     </div>
                 </div>
                 <div class="card bg-surface card-md rounded-xl">
                     <div class="card-body flex flex-col justify-end items-center text-center h-full">
-                        <span class="text-2xl font-bold text-primary">15</span>
+                        <span class="text-2xl font-bold text-success"></span>
                         <span class="text-sm text-muted-foreground">Resolved</span>
                     </div>
                 </div>
                 <div class="card bg-surface card-md rounded-xl">
                     <div class="card-body flex flex-col justify-end items-center text-center h-full">
-                        <span class="text-2xl font-bold text-primary">6</span>
+                        <span class="text-2xl font-bold text-warning"></span>
                         <span class="text-sm text-muted-foreground">Active</span>
                     </div>
                 </div>
                 <div class="card bg-surface card-md rounded-xl">
                     <div class="card-body flex flex-col justify-end items-center text-center h-full">
-                        <span class="text-2xl font-bold text-primary">3</span>
-                        <span class="text-xs text-muted-foreground">Resolved</span>
+                        <span class="text-2xl font-bold text-muted-foreground"></span>
+                        <span class="text-sm text-muted-foreground">Pending</span>
                     </div>
                 </div>
             </div>
@@ -102,9 +102,6 @@
             </div>
         </div>
     </div>
-
-
-
 
     <x-resident.bottom-nav />
 @endsection

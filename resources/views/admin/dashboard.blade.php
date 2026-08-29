@@ -5,7 +5,14 @@
         <button class="btn btn-sm bg-primary">Export</button>
     </x-admin.header>
 
-    <div class="card bg-surface">
+
+    <div class="card bg-surface max-w-40 h-40 rounded-x-20 rounded-br-20 rounded-br-none mb-10">
+        <div class="card-body">
+            Submitted
+        </div>
+    </div>
+
+    <div class="card bg-surface max-w-200">
         <div class="card-body">
 
             <h2 class="font-bold text-lg">

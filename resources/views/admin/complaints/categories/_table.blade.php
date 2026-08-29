@@ -1,5 +1,7 @@
 <div class="px-10 overflow-x-auto">
+
     <table class="table table-md bg-surface">
+
         <thead class="sticky top-0 z-10 bg-gray-700 text-base-content/70 uppercase text-[11px] tracking-wide">
             <tr>
                 <th class="rounded-tl-xl">Id</th>
@@ -11,6 +13,7 @@
         </thead>
 
         <tbody class="text-xs divide-y">
+
             @forelse ($categories as $category)
                 <tr class="hover:bg-base-200/60 transition-colors">
 
@@ -22,7 +25,7 @@
                         <p>{{ $category->name }}</p>
                     </td>
 
-                    <td class="max-w-50 line-clamp-">
+                    <td class="max-w-50">
                         <p class="text-sm text-muted-foreground">
                             {{ $category->description }}
                         </p>
@@ -33,8 +36,11 @@
                             {{ $category->complaints_count }}
                         </p>
                     </td>
+
                     <td>
                         <div class="flex gap-5">
+
+                            {{-- Edit --}}
                             <button type="button"
                                 onclick="document.getElementById('edit-category-{{ $category->id }}').showModal()">
                                 <x-icons.edit />
@@ -44,20 +50,26 @@
                                 <form method="POST" action="{{ route('admin.categories.update', $category) }}">
                                     @csrf
                                     @method('PATCH')
+
                                     <x-field name="name" label="Category name" :value="$category->name" />
+
                                     <x-field name="description" type="textarea" label="Description" :value="$category->description" />
+
                                     <div class="flex mt-2 justify-end">
                                         <x-button type="submit" class="w-full">
                                             Save Changes
                                         </x-button>
                                     </div>
+
                                 </form>
                             </x-modal>
 
+                            {{-- Archive / Restore --}}
                             @if ($archivedView ?? false)
                                 <form method="POST" action="{{ route('admin.categories.unarchive', $category) }}">
                                     @csrf
                                     @method('PATCH')
+
                                     <button type="submit">
                                         <x-icons.archive-restore />
                                     </button>
@@ -66,14 +78,14 @@
                                 <form method="POST" action="{{ route('admin.categories.archive', $category) }}">
                                     @csrf
                                     @method('PATCH')
+
                                     <button type="submit">
                                         <x-icons.archive />
-
                                     </button>
                                 </form>
                             @endif
 
-
+                            {{-- Delete --}}
                             @if ($category->complaints_count)
                                 <button type="button"
                                     onclick="document.getElementById('delete-category-{{ $category->id }}').showModal()">
@@ -85,36 +97,61 @@
                                 <form method="POST" action="{{ route('admin.categories.destroy', $category) }}">
                                     @csrf
                                     @method('DELETE')
-                                    Delete {{ $category->name }} category?
-                                    <div class="flex justify-end mt-2">
-                                        <x-button type="submit" class="btn btn-outline">
+
+                                    <p>
+                                        Delete {{ $category->name }} category?
+                                    </p>
+
+                                    <div class="flex justify-end mt-2 gap-2">
+
+                                        <x-button type="button" class="btn btn-outline"
+                                            onclick="document.getElementById('delete-category-{{ $category->id }}').close()">
                                             Cancel
                                         </x-button>
+
                                         <x-button type="submit" class="btn btn-error">
                                             Confirm Deletion
                                         </x-button>
+
                                     </div>
+
                                 </form>
                             </x-modal>
 
                         </div>
                     </td>
+
                 </tr>
+
             @empty
+
                 <tr>
                     <td colspan="5" class="py-12">
+
                         <div class="flex flex-col items-center justify-center text-center gap-1">
+
                             <p class="text-base-content/60">
                                 No categories found.
                             </p>
 
                             <p class="text-sm text-base-content/40">
-                                Try adjusting your filters or search.
+                                Try adjusting your search.
                             </p>
+
                         </div>
+
                     </td>
                 </tr>
             @endforelse
+
         </tbody>
+
     </table>
+
 </div>
+
+@if ($categories instanceof \Illuminate\Pagination\LengthAwarePaginator)
+    <div class="px-10 py-4">
+        {{ $categories->withQueryString()->links() }}
+    </div>
+@endif

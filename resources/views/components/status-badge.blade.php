@@ -13,7 +13,7 @@
         default => ucfirst(str_replace('_', ' ', $value)),
     };
 
-    $baseClasses = 'badge badge-soft badge-sm font-medium whitespace-nowrap rounded-full';
+    $baseClasses = 'badge badge-sm font-medium whitespace-nowrap rounded-full';
 
     $statusClasses = match ($value) {
         'submitted' => 'badge-primary',

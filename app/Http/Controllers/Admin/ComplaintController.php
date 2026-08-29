@@ -25,7 +25,6 @@ class ComplaintController extends Controller
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('complaint_category_id'),
                 AllowedFilter::exact('priority'),
-
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where(function ($query) use ($value) {
                         $query->where('description', 'like', "%{$value}%")
@@ -40,28 +39,31 @@ class ComplaintController extends Controller
                     });
                 }),
             )
+            ->allowedSorts(...['created_at', 'updated_at'])// ← whitelist these columns
             ->with(['category', 'user', 'images'])
             ->defaultSort('-created_at')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
+
+        $categories = ComplaintCategory::all();
+        $selectedCategory = $request->input('filter.complaint_category_id');
+        $statusCounts = Complaint::allStatusCounts($selectedCategory);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'html' => view('admin.complaints._table', [
                     'complaints' => $complaints,
+                    'categories' => $categories,   // now available if _table needs it
                 ])->render(),
+                'pagination' => $complaints->links('vendor.pagination.compact')->render(),
             ]);
         }
-
-        $categories = ComplaintCategory::all();
-
-        $selectedCategory = $request->input('filter.complaint_category_id');
 
         return view('admin.complaints.index', [
             'complaints' => $complaints,
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
-            'statusCounts' => Complaint::allStatusCounts($selectedCategory),
+            'statusCounts' => $statusCounts,
         ]);
     }
 
@@ -76,15 +78,24 @@ class ComplaintController extends Controller
                     $query->where(function ($query) use ($value) {
                         $query->where('description', 'like', "%{$value}%")
                             ->orWhere('location', 'like', "%{$value}%")
-                            ->orWhereHas('user', fn ($q) => $q->where('first_name', 'like', "%{$value}%")
-                                ->orWhere('last_name', 'like', "%{$value}%"))
-                            ->orWhereHas('category', fn ($q) => $q->where('name', 'like', "%{$value}%"));
+                            ->orWhereHas('user', function ($q) use ($value) {
+                                $q->where('first_name', 'like', "%{$value}%")
+                                    ->orWhere('last_name', 'like', "%{$value}%");
+                            })
+                            ->orWhereHas('category', function ($q) use ($value) {
+                                $q->where('name', 'like', "%{$value}%");
+                            });
                     });
                 }),
             )
+            ->allowedSorts(
+                'created_at',
+                'updated_at',
+                'priority',
+            ) // ← add this
             ->with(['category', 'user', 'images'])
             ->defaultSort('-created_at')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         if ($request->wantsJson()) {
@@ -96,9 +107,16 @@ class ComplaintController extends Controller
             ]);
         }
 
+        $categories = ComplaintCategory::all();
+
+        $selectedCategory = $request->input('filter.complaint_category_id');
+
         return view('admin.complaints.archived', [
             'complaints' => $complaints,
             'archivedView' => true,
+            'categories' => $categories,
+            'selectedCategory' => $selectedCategory,
+            'statusCounts' => Complaint::allStatusCounts($selectedCategory, archived: true),
         ]);
     }
 
@@ -119,24 +137,10 @@ class ComplaintController extends Controller
             return back()->withErrors(['status' => $e->getMessage()]);
         }
 
-        return back()->with('success', 'Complaint updated successfully.');
-    }
+        $message = in_array($complaint->status, [ComplaintStatus::RESOLVED, ComplaintStatus::REJECTED])
+                ? 'Complaint moved to the archived page.'
+                : 'Complaint updated successfully.';
 
-    public function archive($id)
-    {
-        $complaint = Complaint::findOrFail($id);
-        $complaint->is_archived = true;
-        $complaint->save();
-
-        return redirect()->back()->with('success', 'Complaint archived');
-    }
-
-    public function unArchive($id)
-    {
-        $complaint = Complaint::findOrFail($id);
-        $complaint->is_archived = false;
-        $complaint->save();
-
-        return redirect()->back()->with('success', 'Complaint Unarchive.');
+        return back()->with('success', $message);
     }
 }

@@ -1,16 +1,7 @@
 @props(['complaint'])
 
 @if ($complaint->images->isNotEmpty())
-    <div class="mb-4" x-data="{ open: false, activeImage: null }"
-        x-effect="
-            const box = document
-                .getElementById('ReviewComplaint-{{ $complaint->id }}')
-                ?.querySelector('.modal-box');
-
-            if (box) {
-                box.style.overflow = open ? 'hidden' : '';
-            }
-        ">
+    <div class="mb-4" x-data="{ open: false, activeImage: null }">
         <p class="text-xs tracking-wide text-base-content/50 mb-2">
             Photos
         </p>
@@ -29,14 +20,16 @@
             @endforeach
         </div>
 
-        <!-- Fullscreen lightbox -->
-        <div x-show="open" x-cloak @click="open = false"
-            class="fixed inset-0 z-100 flex items-center justify-center bg-black/95">
-            <img :src="activeImage" @click.stop class="w-screen h-screen object-cover">
+        <!-- Fullscreen lightbox, teleported to <body> so it escapes the drawer's stacking context -->
+        <template x-teleport="body">
+            <div x-show="open" x-cloak @click="open = false"
+                class="fixed inset-0 z-100 flex items-center justify-center bg-transparent">
+                <img :src="activeImage" @click.stop class="max-w-[90vw] max-h-[90vh] object-contain">
 
-            <button type="button" @click="open = false" class="btn btn-circle btn-sm absolute top-4 right-4 z-101">
-                ✕
-            </button>
-        </div>
+                <button type="button" @click="open = false" class="btn btn-circle btn-sm absolute top-4 right-4 z-101">
+                    ✕
+                </button>
+            </div>
+        </template>
     </div>
 @endif

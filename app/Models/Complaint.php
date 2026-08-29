@@ -71,10 +71,15 @@ class Complaint extends Model
             ->put('all', $user->complaints()->count());
     }
 
-    public static function allStatusCounts($categoryId = null)
+    public static function allStatusCounts($categoryId = null, bool $archived = false)
     {
         $counts = static::query()
-            ->when($categoryId, fn ($query, $categoryId) => $query->where('complaint_category_id', $categoryId))
+            ->when($archived, fn ($query) => $query->archived())
+            ->when(! $archived, fn ($query) => $query->active())
+            ->when(
+                $categoryId,
+                fn ($query, $categoryId) => $query->where('complaint_category_id', $categoryId)
+            )
             ->selectRaw('status, count(*) as count')
             ->groupBy('status')
             ->pluck('count', 'status');
@@ -86,13 +91,20 @@ class Complaint extends Model
             ->put('all', $counts->sum());
     }
 
-    // app/Models/Complaint.php
-
     #[Override]
     protected static function booted(): void
     {
+
         static::creating(function (Complaint $complaint) {
             $complaint->complaint_id = self::generateComplaintId();
+        });
+
+        static::updating(function ($complaint) {
+            if ($complaint->isDirty('status')) {
+                if (in_array($complaint->status, [ComplaintStatus::RESOLVED, ComplaintStatus::REJECTED])) {
+                    $complaint->is_archived = true;
+                }
+            }
         });
     }
 

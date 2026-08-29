@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ComplaintCategory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ComplaintCategoryController extends Controller
@@ -43,6 +44,14 @@ class ComplaintCategoryController extends Controller
                 ->where('is_archived', true)
                 ->withCount('complaints')
         )
+            ->allowedFilters(
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('name', 'like', "%{$value}%")
+                            ->orWhere('description', 'like', "%{$value}%");
+                    });
+                }),
+            )
             ->defaultSort('-created_at')
             ->paginate(10)
             ->withQueryString();
