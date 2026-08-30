@@ -13,6 +13,8 @@ class Hotline extends Model
     /** @use HasFactory<HotlineFactory> */
     use HasFactory;
 
+    protected $guarded = [];
+
     public function admin()
     {
         return $this->belongsTo(Admin::class);

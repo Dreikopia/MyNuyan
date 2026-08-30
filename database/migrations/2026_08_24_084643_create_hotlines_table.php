@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone_number');
             $table->string('description')->nullable();
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

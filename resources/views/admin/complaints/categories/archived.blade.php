@@ -25,7 +25,6 @@
         }
     }">
 
-        {{-- Search / Actions --}}
         <div class="px-10 py-4 flex items-center justify-between">
 
             <input type="search" x-model="search" x-on:input.debounce.400ms="fetchResults()"
@@ -39,7 +38,6 @@
 
         </div>
 
-        {{-- Table --}}
         <div id="complaint-categories-table">
             @include('admin.complaints.categories._table', [
                 'categories' => $categories,

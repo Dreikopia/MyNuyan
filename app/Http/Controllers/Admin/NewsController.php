@@ -11,26 +11,38 @@ use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        $news = News::query()
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
-                });
-            })
-            ->when($request->category, function ($query, $category) {
-                $query->where('news_category_id', $category);
-            })
-            ->when($request->status, function ($query, $status) {
-                $query->where('status', $status);
-            })
-            ->latest()
+        $news = QueryBuilder::for(News::class)
+            ->allowedFilters(...[
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('title', 'like', "%{$value}%")
+                            ->orWhere('description', 'like', "%{$value}%")
+                            ->orWhereHas('category', function ($query) use ($value) {
+                                $query->where('name', 'like', "%{$value}%");
+                            });
+                    });
+                }),
+                AllowedFilter::exact('category', 'news_category_id'),
+                AllowedFilter::exact('status'),
+            ])
+            ->allowedSorts(...['created_at', 'updated_at', 'title'])
+            ->defaultSort('-created_at')
             ->get();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.news.partials._grid', [
+                    'news' => $news,
+                ])->render(),
+            ]);
+        }
 
         return view('admin.news.index', [
             'categories' => NewsCategory::all(),

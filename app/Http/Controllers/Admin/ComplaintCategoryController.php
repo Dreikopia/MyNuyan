@@ -20,6 +20,14 @@ class ComplaintCategoryController extends Controller
                 ->where('is_archived', false)
                 ->withCount('complaints')
         )
+            ->allowedFilters(
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->where(function ($query) use ($value) {
+                        $query->where('name', 'like', "%{$value}%")
+                            ->orWhere('description', 'like', "%{$value}%");
+                    });
+                }),
+            )
             ->defaultSort('-created_at')
             ->paginate(10)
             ->withQueryString();

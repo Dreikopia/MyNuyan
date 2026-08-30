@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Admin\AdminHotlineController;
 use App\Http\Controllers\Admin\ComplaintCategoryController as AdminComplaintCategoryController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HotlineController;
 use App\Http\Controllers\Admin\NewsCategoryController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\HomepageController;
-use App\Http\Controllers\HotlineController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -27,12 +26,12 @@ Route::middleware('is_admin')
         Route::patch('/complaints/{complaint}', [AdminComplaintController::class, 'update'])->name('complaints.update');
 
         Route::get('/complaints/archived', [AdminComplaintController::class, 'archived'])->name('complaints.archived');
-
         // this route is redundant for now i'm keeping these for possible reopened features or whatever
         Route::patch('/complaints/{complaint}/archive', [AdminComplaintController::class, 'archive'])->name('complaints.archive');
         Route::patch('/complaints/{complaint}/unarchive', [AdminComplaintController::class, 'unArchive'])->name('complaints.unarchive');
 
-        Route::get('/categories', [AdminComplaintCategoryController::class, 'index'])->name('categories');
+        Route::get('/
+        gories', [AdminComplaintCategoryController::class, 'index'])->name('categories');
         Route::post('/categories', [AdminComplaintCategoryController::class, 'store'])->name('categories.store');
 
         Route::get('/categories/archived', [AdminComplaintCategoryController::class, 'archived'])->name('categories.archived');
@@ -53,7 +52,8 @@ Route::middleware('is_admin')
         Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.delete');
         Route::get('/news/category', [NewsCategoryController::class, 'index'])->name('news.categories');
 
-        Route::get('/hotlines', [AdminHotlineController::class, 'index'])->name('hotlines.index');
+        Route::get('/hotlines', [HotlineController::class, 'index'])->name('hotlines.index');
+        Route::post('/hotlines', [HotlineController::class, 'store'])->name('hotlines.store');
     });
 
 Route::middleware('is_resident')

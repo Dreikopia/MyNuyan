@@ -85,34 +85,31 @@
                 <td>
                     @if (!$isFinal)
                         <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
-                            <span class="btn btn-sm btn-outline">
+                            <span class="btn btn-xs btn-outline">
                                 Review
                             </span>
                         </label>
                     @else
                         <div class="flex items-center gap-6">
                             <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
-                                <span class="btn btn-sm btn-outline">
+                                <span class="btn btn-xs btn-outline">
                                     Review
                                 </span>
                             </label>
                         </div>
                     @endif
+
                     <div class="drawer drawer-end">
                         <input id="complaint-drawer-{{ $complaint->id }}" type="checkbox" class="drawer-toggle" />
-
                         <div class="drawer-side z-50">
                             <label for="complaint-drawer-{{ $complaint->id }}" aria-label="close sidebar"
                                 class="drawer-overlay"></label>
-
                             <div class="bg-surface min-h-full w-full max-w-xl lg:max-w-2xl flex flex-col">
                                 <div class="flex items-center justify-between border-b border-base-300 p-6 pb-3">
                                     <div>
                                         <h3 class="text-lg font-bold">
                                             {{ $complaint->complaint_id }}
                                         </h3>
-
-                                        </p>
                                     </div>
                                     <x-status-badge :status="$complaint->status" />
                                 </div>

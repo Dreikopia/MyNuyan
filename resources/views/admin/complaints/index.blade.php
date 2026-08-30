@@ -152,37 +152,54 @@
 
             {{-- Search --}}
             <label class="flex items-center gap-2 bg-base-200 rounded-sm px-3 py-1.5 w-70">
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-base-content/50 shrink-0" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="7" />
-                    <path stroke-linecap="round" d="m21 21-4.3-4.3" />
-                </svg>
-
+                <x-icons.search />
                 <input type="text" x-model="search" x-on:input.debounce.400ms="fetchResults()" autocomplete="off"
                     class="bg-transparent border-none outline-none text-xs w-full placeholder:text-base-content/50"
                     placeholder="Search">
-
             </label>
 
+            {{-- Sort --}}
+            <div class="relative">
+                <button type="button" @click="sortOpen = !sortOpen; filterOpen = false"
+                    class="flex items-center gap-1.5 bg-base-200 rounded-full pl-3 pr-2 py-1.5 text-xs font-medium hover:bg-base-300 transition-colors">
+                    <x-icons.sort />
+                    <span>
+                        Sort:
+                        <span x-text="sortLabels[sort]"></span>
+                    </span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                    </svg>
+
+                </button>
+
+
+                {{-- Sort Popover --}}
+                <div x-show="sortOpen" x-cloak @click.outside="sortOpen = false" x-transition
+                    class="absolute left-0 top-full mt-2 w-40 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
+
+                    <template x-for="[value, label] in Object.entries(sortLabels)" :key="value">
+
+                        <button type="button" @click="sort = value; sortOpen = false; fetchResults()" :class="sort === value ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                            class="w-full text-left px-3 py-1.5 text-xs" x-text="label"></button>
+
+                    </template>
+
+                </div>
+
+            </div>
 
             {{-- Filter --}}
             <div class="relative">
-
                 <button type="button" @click="filterOpen = !filterOpen; sortOpen = false"
                     class="flex items-center gap-1.5 bg-base-200 rounded-full pl-3 pr-2 py-1.5 text-xs font-medium hover:bg-base-300 transition-colors">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M7 12h10M10 18h4" />
-                    </svg>
-
+                    <x-icons.filter />
                     Filter
-
                     <span x-show="hasActiveFilters" x-cloak
                         class="bg-base-content text-base-100 rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold"
                         x-text="(category !== '' ? 1 : 0) + (priority !== '' ? 1 : 0)"></span>
-
                 </button>
 
 
@@ -213,75 +230,25 @@
 
                     </div>
 
-
                     {{-- Priority --}}
                     <div>
-
                         <label class="text-[11px] font-medium text-base-content/60 uppercase">
                             Priority
                         </label>
-
                         <select x-model="priority" @change="fetchResults()"
                             class="select select-bordered select-sm w-full mt-1">
                             <option value="">
                                 All priorities
                             </option>
-
                             @foreach (ComplaintPriority::cases() as $p)
                                 <option value="{{ $p->value }}">
                                     {{ $p->label() }}
                                 </option>
                             @endforeach
-
                         </select>
-
                     </div>
-
                 </div>
-
             </div>
-
-
-            {{-- Sort --}}
-            <div class="relative">
-
-                <button type="button" @click="sortOpen = !sortOpen; filterOpen = false"
-                    class="flex items-center gap-1.5 bg-base-200 rounded-full pl-3 pr-2 py-1.5 text-xs font-medium hover:bg-base-300 transition-colors">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3 7h13M3 12h9M3 17h5M17 4v16m0 0-3-3m3 3 3-3" />
-                    </svg>
-
-                    <span>
-                        Sort:
-                        <span x-text="sortLabels[sort]"></span>
-                    </span>
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
-                    </svg>
-
-                </button>
-
-
-                {{-- Sort Popover --}}
-                <div x-show="sortOpen" x-cloak @click.outside="sortOpen = false" x-transition
-                    class="absolute left-0 top-full mt-2 w-40 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
-
-                    <template x-for="[value, label] in Object.entries(sortLabels)" :key="value">
-
-                        <button type="button" @click="sort = value; sortOpen = false; fetchResults()" :class="sort === value ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
-                            class="w-full text-left px-3 py-1.5 text-xs" x-text="label"></button>
-
-                    </template>
-
-                </div>
-
-            </div>
-
 
             {{-- Active Category Pill --}}
             <template x-if="category !== ''">
