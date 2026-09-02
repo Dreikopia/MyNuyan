@@ -8,47 +8,94 @@
 @section('content')
     <x-admin.header title="Complaints">
 
-        <x-button class="btn bg-primary/50 rounded-t-xl rounded-bl-xl rounded-br-none" href="{{ route('admin.categories') }}">
+        {{-- plain <a> instead of <x-button>, styled the same way with daisyUI classes --}}
+        <a href="{{ route('admin.categories') }}" class="btn btn-sm bg-primary/50 rounded-t-xl rounded-bl-xl rounded-br-none">
             Manage Categories
-        </x-button>
+        </a>
 
-        <x-icons.notifications />
+        {{-- plain bell icon instead of <x-icons.notifications> --}}
+        <button type="button" class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
+            </svg>
+        </button>
 
     </x-admin.header>
 
 
     <div x-data="{
+        // ---- filter values (read from the URL on first load, so refreshing keeps your filters) ----
         search: @js(request('filter.search', '')),
         status: @js(request('filter.status', '')),
         category: @js(request('filter.complaint_category_id', '')),
         priority: @js(request('filter.priority', '')),
         sort: @js(request('sort', '-created_at')),
     
-        filterOpen: false,
+        // ---- pagination values ----
+        perPage: @js((int) request('per_page', 10)),
+        page: @js((int) request('page', 1)),
+    
+        // ---- which popover is currently open (only one at a time) ----
+        statusOpen: false,
+        categoryOpen: false,
+        priorityOpen: false,
         sortOpen: false,
+        perPageOpen: false,
+    
         loading: false,
     
+        // ---- info about the current page of results, filled in from the server after every fetch ----
+        meta: {
+            from: {{ $complaints->firstItem() ?? 0 }},
+            to: {{ $complaints->lastItem() ?? 0 }},
+            total: {{ $complaints->total() }},
+            lastPage: {{ $complaints->lastPage() }},
+        },
+    
+        // ---- human-readable labels, built once from the PHP enums/collections ----
+        statusLabels: @js(collect(ComplaintStatus::cases())->mapWithKeys(fn($s) => [$s->value => $s->label()])),
         categoryLabels: @js($categories->pluck('name', 'id')),
-    
         priorityLabels: @js(collect(ComplaintPriority::cases())->mapWithKeys(fn($p) => [$p->value => $p->label()])),
-    
         sortLabels: {
             '-created_at': 'Newest',
             'created_at': 'Oldest',
             '-updated_at': 'Date Modified'
         },
     
-        get hasActiveFilters() {
-            return this.category !== '' || this.priority !== '';
+        // ---- computed helpers ----
+        get canGoPrev() { return this.page > 1; },
+        get canGoNext() { return this.page < this.meta.lastPage; },
+    
+        closeDropdowns() {
+            this.statusOpen = false;
+            this.categoryOpen = false;
+            this.priorityOpen = false;
+            this.sortOpen = false;
         },
     
-        clearCategory() {
-            this.category = '';
+        // any time a FILTER changes we jump back to page 1 -
+        // otherwise you could land on 'page 3' of a filtered list that only has 1 page.
+        filterChanged() {
+            this.page = 1;
             this.fetchResults();
         },
     
-        clearPriority() {
-            this.priority = '';
+        changePerPage() {
+            this.page = 1;
+            this.fetchResults();
+        },
+    
+        prevPage() {
+            if (!this.canGoPrev) return;
+            this.page--;
+            this.fetchResults();
+        },
+    
+        nextPage() {
+            if (!this.canGoNext) return;
+            this.page++;
             this.fetchResults();
         },
     
@@ -66,10 +113,7 @@
             }
     
             if (this.category) {
-                params.set(
-                    'filter[complaint_category_id]',
-                    this.category
-                );
+                params.set('filter[complaint_category_id]', this.category);
             }
     
             if (this.priority) {
@@ -79,6 +123,9 @@
             if (this.sort) {
                 params.set('sort', this.sort);
             }
+    
+            params.set('per_page', this.perPage);
+            params.set('page', this.page);
     
             fetch('{{ route('admin.complaints') }}?' + params.toString(), {
                     headers: {
@@ -94,12 +141,13 @@
                 })
                 .then(data => {
                     document.getElementById('complaints-table').innerHTML = data.html;
-                    document.getElementById('complaints-pagination').innerHTML = data.pagination;
     
-                    history.pushState({},
-                        '',
-                        '?' + params.toString()
-                    );
+                    this.meta.from = data.meta.from;
+                    this.meta.to = data.meta.to;
+                    this.meta.total = data.meta.total;
+                    this.meta.lastPage = data.meta.last_page;
+    
+                    history.pushState({}, '', '?' + params.toString());
                 })
                 .catch(error => {
                     console.error(error);
@@ -108,247 +156,348 @@
                     this.loading = false;
                 });
         }
-    }" x-init="document.addEventListener('click', (e) => {
-        const link = e.target.closest('#complaints-pagination a');
-    
-        if (!link) {
-            return;
-        }
-    
-        e.preventDefault();
-    
-        const url = new URL(link.href);
-    
-        loading = true;
-    
-        fetch(url, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Failed to fetch complaints.');
-                }
-    
-                return res.json();
-            })
-            .then(data => {
-                document.getElementById('complaints-table').innerHTML = data.html;
-                document.getElementById('complaints-pagination').innerHTML = data.pagination;
-    
-                history.pushState({}, '', url);
-            })
-            .catch(error => {
-                console.error(error);
-            })
-            .finally(() => {
-                loading = false;
-            });
-    });">
+    }">
 
-        {{-- Row 1: Search, Filter, Sort + Active Filter Pills --}}
-        <div class="flex items-center gap-2 py-4 flex-wrap">
+        <div class="flex items-end justify-between gap-2 pb-3 flex-wrap">
+    <div class="flex items-end gap-2 flex-wrap">
 
-            {{-- Search --}}
-            <label class="flex items-center gap-2 bg-base-200 rounded-sm px-3 py-1.5 w-70">
-                <x-icons.search />
-                <input type="text" x-model="search" x-on:input.debounce.400ms="fetchResults()" autocomplete="off"
+        {{-- Search --}}
+        <div>
+            <label class="flex items-center gap-2 bg-base-200 rounded-sm px-3 py-1.5 w-56">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4 opacity-60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="7" />
+                    <path stroke-linecap="round" d="m21 21-4.3-4.3" />
+                </svg>
+
+                <input
+                    type="text"
+                    x-model="search"
+                    x-on:input.debounce.400ms="filterChanged()"
+                    autocomplete="off"
                     class="bg-transparent border-none outline-none text-xs w-full placeholder:text-base-content/50"
                     placeholder="Search">
             </label>
-
-            {{-- Sort --}}
-            <div class="relative">
-                <button type="button" @click="sortOpen = !sortOpen; filterOpen = false"
-                    class="flex items-center gap-1.5 bg-base-200 rounded-full pl-3 pr-2 py-1.5 text-xs font-medium hover:bg-base-300 transition-colors">
-                    <x-icons.sort />
-                    <span>
-                        Sort:
-                        <span x-text="sortLabels[sort]"></span>
-                    </span>
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
-                    </svg>
-
-                </button>
-
-
-                {{-- Sort Popover --}}
-                <div x-show="sortOpen" x-cloak @click.outside="sortOpen = false" x-transition
-                    class="absolute left-0 top-full mt-2 w-40 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
-
-                    <template x-for="[value, label] in Object.entries(sortLabels)" :key="value">
-
-                        <button type="button" @click="sort = value; sortOpen = false; fetchResults()" :class="sort === value ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
-                            class="w-full text-left px-3 py-1.5 text-xs" x-text="label"></button>
-
-                    </template>
-
-                </div>
-
-            </div>
-
-            {{-- Filter --}}
-            <div class="relative">
-                <button type="button" @click="filterOpen = !filterOpen; sortOpen = false"
-                    class="flex items-center gap-1.5 bg-base-200 rounded-full pl-3 pr-2 py-1.5 text-xs font-medium hover:bg-base-300 transition-colors">
-                    <x-icons.filter />
-                    Filter
-                    <span x-show="hasActiveFilters" x-cloak
-                        class="bg-base-content text-base-100 rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold"
-                        x-text="(category !== '' ? 1 : 0) + (priority !== '' ? 1 : 0)"></span>
-                </button>
-
-
-                {{-- Filter Popover --}}
-                <div x-show="filterOpen" x-cloak @click.outside="filterOpen = false" x-transition
-                    class="absolute left-0 top-full mt-2 w-56 bg-base-100 border border-base-300 rounded-box shadow-lg p-3 z-30 space-y-3">
-
-                    {{-- Category --}}
-                    <div>
-
-                        <label class="text-[11px] font-medium text-base-content/60 uppercase">
-                            Category
-                        </label>
-
-                        <select x-model="category" @change="fetchResults()"
-                            class="select select-bordered select-sm w-full mt-1">
-                            <option value="">
-                                All categories
-                            </option>
-
-                            @foreach ($categories as $categoryOption)
-                                <option value="{{ $categoryOption->id }}">
-                                    {{ $categoryOption->name }}
-                                </option>
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-                    {{-- Priority --}}
-                    <div>
-                        <label class="text-[11px] font-medium text-base-content/60 uppercase">
-                            Priority
-                        </label>
-                        <select x-model="priority" @change="fetchResults()"
-                            class="select select-bordered select-sm w-full mt-1">
-                            <option value="">
-                                All priorities
-                            </option>
-                            @foreach (ComplaintPriority::cases() as $p)
-                                <option value="{{ $p->value }}">
-                                    {{ $p->label() }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Active Category Pill --}}
-            <template x-if="category !== ''">
-
-                <span
-                    class="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-
-                    Category:
-
-                    <span x-text="categoryLabels[category]"></span>
-
-                    <button type="button" @click="clearCategory()" class="hover:bg-primary/20 rounded-full p-0.5">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </span>
-
-            </template>
-
-
-            {{-- Active Priority Pill --}}
-            <template x-if="priority !== ''">
-
-                <span
-                    class="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-
-                    Priority:
-
-                    <span x-text="priorityLabels[priority]"></span>
-
-                    <button type="button" @click="clearPriority()" class="hover:bg-primary/20 rounded-full p-0.5">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-
-                    </button>
-
-                </span>
-
-            </template>
-
         </div>
 
 
-        {{-- Row 2: Status pills + View Archived, inline together --}}
-        <div class="flex items-center justify-between gap-2 pb-3 flex-wrap">
-            <div class="flex items-center gap-1.5 flex-wrap">
-                <button type="button" @click="status = ''; fetchResults()" :class="status === '' ? 'bg-base-content text-base-100' : 'bg-base-200 text-base-content/70 hover:bg-base-300'"
-                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors">
-                    All <span class="opacity-70">{{ $statusCounts->get('all', 0) }}</span>
+        {{-- Status --}}
+        <div class="relative">
+            <button
+                type="button"
+                @click="statusOpen = !statusOpen; categoryOpen = false; priorityOpen = false; sortOpen = false"
+                :class="status !== ''
+                    ? 'bg-primary/20 text-primary'
+                    : 'bg-base-200 text-base-content/70 hover:bg-base-300'"
+                class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors">
+
+                <span>
+                    Status:
+                </span>
+
+                <span x-text="status !== '' ? statusLabels[status] : 'All'"></span>
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-3 h-3 opacity-60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m6 9 6 6 6-6" />
+                </svg>
+            </button>
+
+            <div
+                x-show="statusOpen"
+                x-cloak
+                @click.outside="statusOpen = false"
+                x-transition
+                class="absolute left-0 top-full mt-2 w-44 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
+
+                <button
+                    type="button"
+                    @click="status = ''; statusOpen = false; filterChanged()"
+                    :class="status === '' ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                    class="w-full text-left px-3 py-1.5 text-xs">
+                    All
                 </button>
 
                 @foreach (ComplaintStatus::cases() as $s)
-                    <button type="button" @click="status = '{{ $s->value }}'; fetchResults()" :class="status === '{{ $s->value }}' ? 'bg-base-content text-base-100' : 'bg-base-200 text-base-content/70 hover:bg-base-300'"
-                        class="px-3 py-1 rounded-full text-xs font-medium transition-colors">
-                        {{ $s->label() }} <span class="opacity-70">{{ $statusCounts->get($s->value, 0) }}</span>
+                    <button
+                        type="button"
+                        @click="status = '{{ $s->value }}'; statusOpen = false; filterChanged()"
+                        :class="status === '{{ $s->value }}' ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                        class="w-full text-left px-3 py-1.5 text-xs">
+                        {{ $s->label() }}
                     </button>
                 @endforeach
             </div>
-
-            <a href="{{ route('admin.complaints.archived') }}" class="btn btn-sm btn-outline shrink-0">
-                <x-icons.archive class="w-3.5 h-3.5" />
-                View Archived
-            </a>
         </div>
 
 
-        {{-- <div class="flex justify-end mb-2">
-            <div id="complaints-pagination">
-                {{ $complaints->links('vendor.pagination.compact') }}
+        {{-- Category --}}
+        <div class="relative">
+            <button
+                type="button"
+                @click="categoryOpen = !categoryOpen; statusOpen = false; priorityOpen = false; sortOpen = false"
+                :class="category !== ''
+                    ? 'bg-primary/20 text-primary'
+                    : 'bg-base-200 text-base-content/70 hover:bg-base-300'"
+                class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors">
+
+                <span>
+                    Category:
+                </span>
+
+                <span x-text="category !== '' ? categoryLabels[category] : 'All'"></span>
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-3 h-3 opacity-60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m6 9 6 6 6-6" />
+                </svg>
+            </button>
+
+            <div
+                x-show="categoryOpen"
+                x-cloak
+                @click.outside="categoryOpen = false"
+                x-transition
+                class="absolute left-0 top-full mt-2 w-52 max-h-64 overflow-y-auto bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
+
+                <button
+                    type="button"
+                    @click="category = ''; categoryOpen = false; filterChanged()"
+                    :class="category === '' ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                    class="w-full text-left px-3 py-1.5 text-xs">
+                    All
+                </button>
+
+                @foreach ($categories as $categoryOption)
+                    <button
+                        type="button"
+                        @click="category = '{{ $categoryOption->id }}'; categoryOpen = false; filterChanged()"
+                        :class="category === '{{ $categoryOption->id }}' ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                        class="w-full text-left px-3 py-1.5 text-xs">
+                        {{ $categoryOption->name }}
+                    </button>
+                @endforeach
             </div>
-        </div> --}}
+        </div>
 
 
-        {{-- Table --}}
+        {{-- Priority --}}
+        <div class="relative">
+            <button
+                type="button"
+                @click="priorityOpen = !priorityOpen; statusOpen = false; categoryOpen = false; sortOpen = false"
+                :class="priority !== ''
+                    ? 'bg-primary/20 text-primary'
+                    : 'bg-base-200 text-base-content/70 hover:bg-base-300'"
+                class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors">
+
+                <span>
+                    Priority:
+                </span>
+
+                <span x-text="priority !== '' ? priorityLabels[priority] : 'All'"></span>
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-3 h-3 opacity-60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m6 9 6 6 6-6" />
+                </svg>
+            </button>
+
+            <div
+                x-show="priorityOpen"
+                x-cloak
+                @click.outside="priorityOpen = false"
+                x-transition
+                class="absolute left-0 top-full mt-2 w-44 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
+
+                <button
+                    type="button"
+                    @click="priority = ''; priorityOpen = false; filterChanged()"
+                    :class="priority === '' ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                    class="w-full text-left px-3 py-1.5 text-xs">
+                    All
+                </button>
+
+                @foreach (ComplaintPriority::cases() as $p)
+                    <button
+                        type="button"
+                        @click="priority = '{{ $p->value }}'; priorityOpen = false; filterChanged()"
+                        :class="priority === '{{ $p->value }}' ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                        class="w-full text-left px-3 py-1.5 text-xs">
+                        {{ $p->label() }}
+                    </button>
+                @endforeach
+            </div>
+        </div>
+
+
+        {{-- Sort --}}
+        <div class="relative">
+            <button
+                type="button"
+                @click="sortOpen = !sortOpen; statusOpen = false; categoryOpen = false; priorityOpen = false"
+                class="flex items-center gap-1.5 bg-base-200 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-base-300 transition-colors">
+
+                <span>
+                    Sort:
+                </span>
+
+                <span x-text="sortLabels[sort]"></span>
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-3 h-3 opacity-60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m6 9 6 6 6-6" />
+                </svg>
+            </button>
+
+            <div
+                x-show="sortOpen"
+                x-cloak
+                @click.outside="sortOpen = false"
+                x-transition
+                class="absolute left-0 top-full mt-2 w-40 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
+
+                <template
+                    x-for="[value, label] in Object.entries(sortLabels)"
+                    :key="value">
+
+                    <button
+                        type="button"
+                        @click="sort = value; sortOpen = false; filterChanged()"
+                        :class="sort === value ? 'bg-base-200 font-medium' : 'hover:bg-base-200'"
+                        class="w-full text-left px-3 py-1.5 text-xs"
+                        x-text="label">
+                    </button>
+
+                </template>
+            </div>
+        </div>
+
+    </div>
+
+
+    {{-- View Archived --}}
+    <a
+        href="{{ route('admin.complaints.archived') }}"
+        class="btn btn-sm btn-outline shrink-0">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="w-3.5 h-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2">
+            <rect x="3" y="4" width="18" height="4" rx="1" />
+            <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8" />
+            <path stroke-linecap="round" d="M10 12h4" />
+        </svg>
+
+        View Archived
+    </a>
+</div>
+
+
+
+        {{-- Table (this is the ONLY part that scrolls) --}}
         <div class="relative">
 
-            {{-- Loading Overlay --}}
             <div x-show="loading" x-transition.opacity
                 class="absolute inset-0 bg-base-100/60 flex items-center justify-center z-20 rounded-md">
                 <span class="loading loading-spinner loading-sm"></span>
             </div>
 
-
-            {{-- Complaints Table --}}
             <div class="max-h-[600px] overflow-y-auto rounded-md scrollbar-thin border border-base-300">
-
                 <div id="complaints-table">
                     @include('admin.complaints._table')
                 </div>
-
             </div>
 
+        </div>
+
+
+        {{-- Pagination bar --}}
+        <div class="flex items-center justify-between mt-2">
+
+            <span class="text-[11px] text-base-content/60">
+                <template x-if="meta.total > 0">
+                    <span>
+                        <span x-text="meta.from"></span>-<span x-text="meta.to"></span> of <span
+                            x-text="meta.total"></span>
+                    </span>
+                </template>
+                <template x-if="meta.total === 0">
+                    <span>0 results</span>
+                </template>
+            </span>
+
+            <div class="flex items-center gap-1.5">
+
+                <div class="relative">
+                    <button type="button" @click="perPageOpen = !perPageOpen"
+                        class="flex items-center gap-1 bg-base-200 rounded-full px-2.5 py-1 text-[11px] hover:bg-base-300">
+                        <span x-text="perPage + ' / page'"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-60" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+
+                    <div x-show="perPageOpen" x-cloak @click.outside="perPageOpen = false" x-transition
+                        class="absolute bottom-full right-0 mb-2 w-20 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
+
+                        <template x-for="opt in [10, 25, 50]" :key="opt">
+                            <button type="button" @click="perPage = opt; perPageOpen = false; changePerPage()"
+                                :class="perPage === opt ? 'bg-base-200 font-medium' : 'hover:bg-base-200'" class="w-full text-left px-3 py-1 text-[11px]" x-text="opt"></button>
+                        </template>
+
+                    </div>
+                </div>
+
+                <button type="button" @click="prevPage()" :disabled="!canGoPrev" :class="!canGoPrev ? 'opacity-30 cursor-not-allowed' : 'hover:bg-base-300'"
+                    class="w-6 h-6 flex items-center justify-center rounded-full bg-base-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" />
+                    </svg>
+                </button>
+
+                <button type="button" @click="nextPage()" :disabled="!canGoNext" :class="!canGoNext ? 'opacity-30 cursor-not-allowed' : 'hover:bg-base-300'"
+                    class="w-6 h-6 flex items-center justify-center rounded-full bg-base-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" />
+                    </svg>
+                </button>
+
+            </div>
         </div>
 
     </div>

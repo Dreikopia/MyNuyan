@@ -3,7 +3,7 @@
 @section('content')
     <form method="POST" action="{{ route('admin.login') }}">
         @csrf
-        <div class="bg-card card-border min-h-screen w-1/2 flex items-center">
+        <div class="bg-surface card-border min-h-screen w-1/2 flex items-center">
             <div class="card-body">
                 <h2 class="card-title">Welcome</h2>
                 <x-field name="username" label="Username" />

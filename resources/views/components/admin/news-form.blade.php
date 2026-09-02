@@ -6,13 +6,14 @@
     $modalName = $isEditing ? 'Edit' : 'Create';
 @endphp
 
-<x-modal :id="$modalId" :name="$modalName" boxClass="max-w-2xl" :trigger="!$isEditing" class="btn btn-primary">
+<x-modal :id="$modalId" :name="$modalName" boxClass="max-w-2xl bg-surface" :trigger="!$isEditing" class="btn btn-primary">
 
     <form x-data="{
         errors: {},
         submitting: false,
         removeImage: false,
         imagePreview: null,
+        dragging: false,
     
         handleImage(event) {
             const file = event.target.files[0];
@@ -22,6 +23,16 @@
                 return;
             }
     
+            this.imagePreview = URL.createObjectURL(file);
+        },
+    
+        handleDrop(event) {
+            this.dragging = false;
+            const file = event.dataTransfer.files[0];
+    
+            if (!file) return;
+    
+            this.$refs.imageInput.files = event.dataTransfer.files;
             this.imagePreview = URL.createObjectURL(file);
         },
     
@@ -64,7 +75,8 @@
                 this.submitting = false;
             }
         }
-    }" @submit.prevent="submitForm" method="POST" enctype="multipart/form-data"
+    }" @submit.prevent="submitForm" @submit="console.log('FORM SUBMITTED')" method="POST"
+        enctype="multipart/form-data"
         action="{{ $isEditing ? route('admin.news.update', $post) : route('admin.news.store') }}">
 
         @csrf
@@ -74,29 +86,32 @@
         @endif
 
         <div class="flex flex-col">
-            <div class="space-y-4">
+            <div class="space-y-5">
 
                 <x-field name="title" label="Title" placeholder="News Title" :value="$post->title ?? old('title')" />
 
                 <div class="space-y-3">
                     <label class="label">
-                        <span class="label-text font-medium">
+                        <span class="label-text text-sm">
                             Featured Image
                         </span>
                     </label>
 
+                    {{-- Existing image (edit mode, nothing removed/replaced yet) --}}
                     @if ($isEditing && $post->image_path)
-                        <div x-show="!removeImage && !imagePreview" x-cloak class="space-y-3">
+                        <div x-show="!removeImage && !imagePreview" x-cloak class="relative group">
                             <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}"
-                                class="w-full h-48 object-cover rounded-lg">
+                                class="w-full h-48 object-cover rounded-lg border border-base-content/10">
 
-                            <button type="button" @click="removeImage = true" class="btn btn-error btn-outline w-full">
-                                Remove Image
-                            </button>
-
-                            <p class="text-xs text-base-content/60 text-center">
-                                Remove the current image to upload a replacement.
-                            </p>
+                            <div
+                                class="absolute inset-0 flex items-end justify-end gap-2 p-3 rounded-lg bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button type="button" @click="$refs.imageInput.click()" class="btn btn-sm btn-neutral">
+                                    Replace
+                                </button>
+                                <button type="button" @click="removeImage = true" class="btn btn-sm btn-error">
+                                    Remove
+                                </button>
+                            </div>
                         </div>
 
                         <div x-show="removeImage && !imagePreview" x-cloak class="alert alert-warning">
@@ -117,28 +132,41 @@
                         </div>
                     @endif
 
-                    <div x-show="imagePreview" x-cloak class="space-y-3">
-                        <img :src="imagePreview" alt="New image preview" class="w-full h-48 object-cover rounded-lg">
+                    {{-- New image preview --}}
+                    <div x-show="imagePreview" x-cloak class="relative group">
+                        <img :src="imagePreview" alt="New image preview"
+                            class="w-full h-48 object-cover rounded-lg border border-base-content/10">
 
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-success font-medium">
-                                New image selected
-                            </span>
+                        <div
+                            class="absolute inset-0 flex items-end justify-between gap-2 p-3 rounded-lg bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
 
-                            <button type="button" @click="removeSelectedImage()" class="btn btn-sm btn-outline">
+                            <button type="button" @click="removeSelectedImage()" class="btn btn-sm btn-neutral">
                                 Choose Another
                             </button>
                         </div>
                     </div>
 
-                    <div @if ($isEditing && $post->image_path) x-show="removeImage" @endif x-cloak class="space-y-2">
+                    {{-- Dashed dropzone: only shown when there is nothing to preview yet --}}
+                    <div @if ($isEditing && $post->image_path) x-show="removeImage && !imagePreview"
+                        @else x-show="!imagePreview" @endif
+                        x-cloak @dragover.prevent="dragging = true" @dragleave.prevent="dragging = false"
+                        @drop.prevent="handleDrop($event)" @click="$refs.imageInput.click()" :class="dragging
+                            ? 'border-primary bg-primary/5'
+                            : 'border-base-content/20 hover:border-primary/60 hover:bg-base-200/40'"
+                        class="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 text-center cursor-pointer transition-colors">
+
+                        <x-icons.upload class="w-8 h-8 text-base-content/40" />
+
+                        <p class="text-sm font-medium">
+                            <span class="text-primary">Click to upload</span> or drag and drop
+                        </p>
+
+                        <p class="text-xs text-base-content/50">
+                            JPG, PNG, or WebP
+                        </p>
 
                         <input x-ref="imageInput" type="file" name="image" accept="image/jpeg,image/png,image/webp"
-                            @change="handleImage" class="file-input file-input-bordered w-full">
-
-                        <p class="text-xs text-base-content/60">
-                            JPG, PNG, or WebP.
-                        </p>
+                            @change="handleImage" class="hidden">
                     </div>
 
                     @if ($isEditing && $post->image_path)

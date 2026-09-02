@@ -1,5 +1,5 @@
 {{-- drawer-content.blade.php --}}
-<div class="flex flex-col flex-1 overflow-hidden">
+<div class="flex flex-col flex-1 overflow-hidden" x-data="{ lightboxOpen: false }">
 
     {{-- Header --}}
     <div class="flex items-center justify-between p-6 pb-3">
@@ -48,8 +48,20 @@
 
     <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         @if ($post->image_path)
-            <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}"
-                class="w-full h-full max-h-64 object-cover rounded-lg">
+            <button type="button" @click="lightboxOpen = true"
+                class="group relative w-full block rounded-lg overflow-hidden cursor-zoom-in">
+                <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}"
+                    class="w-full h-full max-h-64 object-cover transition-transform duration-300 group-hover:scale-105">
+
+                <div
+                    class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
+                    <span
+                        class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-white text-sm font-medium bg-black/50 px-3 py-1.5 rounded-full">
+                        <x-icons.expand class="w-4 h-4" />
+                        View full image
+                    </span>
+                </div>
+            </button>
         @endif
 
         <div class="space-y-3">
@@ -66,5 +78,25 @@
             </div>
         </div>
     </div>
-    <x-admin.news-modal :categories="$categories" :post="$post" />
+    <x-admin.news-form :categories="$categories" :post="$post" />
+
+    {{-- Lightbox: teleported to <body> so it can cover the whole screen, --}}
+    {{-- not just this drawer (which has its own overflow/stacking context). --}}
+    @if ($post->image_path)
+        <template x-teleport="body">
+            <div x-show="lightboxOpen" x-cloak @keydown.escape.window="lightboxOpen = false" x-transition.opacity
+                class="fixed inset-0 z-[999] flex items-center justify-center bg-black/90 p-4 md:p-10"
+                @click="lightboxOpen = false">
+
+                <button type="button" @click="lightboxOpen = false"
+                    class="btn btn-circle btn-ghost text-white absolute top-4 right-4" aria-label="Close">
+                    X
+                </button>
+
+                <img src="{{ asset('storage/' . $post->image_path) }}" alt="{{ $post->title }}" @click.stop
+                    class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            </div>
+        </template>
+    @endif
+
 </div>

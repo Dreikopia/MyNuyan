@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreComplaintCategory;
+use App\Http\Requests\UpdateComplaintCategory;
 use App\Models\ComplaintCategory;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -78,12 +79,9 @@ class ComplaintCategoryController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreComplaintCategory $request)
     {
-        $validated = $request->validate([
-            'category_name' => 'required|max:100|unique:complaint_categories,name',
-            'description' => 'nullable|max:100',
-        ]);
+        $validated = $request->validated();
 
         ComplaintCategory::create([
             'name' => $validated['category_name'],
@@ -95,17 +93,11 @@ class ComplaintCategoryController extends Controller
             ->with('success', 'Category has been added!');
     }
 
-    public function update(Request $request, ComplaintCategory $category)
+    public function update(UpdateComplaintCategory $request, ComplaintCategory $category)
     {
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'max:100',
-                Rule::unique('complaint_categories', 'name')
-                    ->ignore($category->id),
-            ],
-            'description' => 'nullable|string|max:500',
-        ]);
+        $validated = $request->validated();
+
+        $validated['default_priority'] ??= $category->default_priority->value;
 
         $category->update($validated);
 
@@ -116,12 +108,11 @@ class ComplaintCategoryController extends Controller
 
     public function destroy(ComplaintCategory $category)
     {
-
         if ($category->complaints()->exists()) {
             return back()->with('error', 'Cannot delete a category that has complaints assigned to it.');
         }
 
-        $category->delete();
+        $category->delete($category);
 
         return redirect()
             ->route('admin.categories')

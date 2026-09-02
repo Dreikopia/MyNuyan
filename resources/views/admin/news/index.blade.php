@@ -1,7 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
-    <x-admin.header title="News and Announcements" description="Manage News and announcements"></x-admin.header>
+    <x-admin.header title="News and Announcements" description="Manage News and announcements">
+        <x-admin.news-form :categories="$categories" />
+    </x-admin.header>
     <div x-data="{
         search: @js(request('search', '')),
         status: @js(request('status', '')),

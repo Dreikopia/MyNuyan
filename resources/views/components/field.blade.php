@@ -36,6 +36,7 @@
             ]) }}>
     @endif
 
+
     <template x-if="errors.{{ $name }}">
         <label class="label">
             <span class="label-text-alt text-error" x-text="errors.{{ $name }}[0]"></span>

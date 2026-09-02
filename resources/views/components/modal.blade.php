@@ -18,11 +18,10 @@
 <dialog id="{{ $id }}" class="modal min-h-50">
     <div @class(['modal-box', $boxClass])>
 
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                ✕
-            </button>
-        </form>
+        <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onclick="document.getElementById('{{ $id }}').close()">
+            ✕
+        </button>
 
         {{ $slot }}
 

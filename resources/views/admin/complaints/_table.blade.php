@@ -9,7 +9,7 @@
             <th>Id</th>
             <th>Category</th>
             <th>Complainant</th>
-            <th>Date</th>
+            <th>Created</th>
             <th>Priority</th>
             <th>Status</th>
             <th>Action</th>
@@ -27,21 +27,15 @@
                 </td>
                 <td class="max-w-50">
                     <p>{{ $complaint->category->name }}</p>
-                    <span class="text-xs text-muted-foreground line-clamp-1">
-                        {{ $complaint->description }}
-                    </span>
+
                 </td>
                 <td class="max-w-30">
                     <p class="line-clamp-1 text-xs">
-                    <p>{{ $complaint->user->first_name }}</p>
-                    <span class="text-xs text-muted-foreground line-clamp-1">
-                        {{ $complaint->user->phone_number }}
-                    </span>
-                    </p>
+                    <p>{{ $complaint->user->first_name }}
                 </td>
 
                 <td class="whitespace-nowrap text-base-content/70">
-                    {{ $complaint->created_at->format('M d') }}
+                    {{ $complaint->created_at->diffForHumans() }}
                 </td>
                 <td class="px-4 py-3">
                     @if ($isFinal)
@@ -75,6 +69,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
                                 </svg>
                             </div>
+
                         </form>
                     @endif
                 </td>
@@ -102,11 +97,19 @@
                     <div class="drawer drawer-end">
                         <input id="complaint-drawer-{{ $complaint->id }}" type="checkbox" class="drawer-toggle" />
                         <div class="drawer-side z-50">
-                            <label for="complaint-drawer-{{ $complaint->id }}" aria-label="close sidebar"
-                                class="drawer-overlay"></label>
+
                             <div class="bg-surface min-h-full w-full max-w-xl lg:max-w-2xl flex flex-col">
                                 <div class="flex items-center justify-between border-b border-base-300 p-6 pb-3">
-                                    <div>
+
+
+                                    <div class="flex">
+
+                                        <label for="complaint-drawer-{{ $complaint->id }}">
+                                            <x-icons.panel-right />
+                                        </label>
+
+                                        Expand
+
                                         <h3 class="text-lg font-bold">
                                             {{ $complaint->complaint_id }}
                                         </h3>
@@ -275,13 +278,9 @@
                                         @endif
                                     </div>
 
-                                    {{-- FOOTER: stays visible even when the content above scrolls --}}
                                     <div
                                         class="sticky bottom-0 z-10 flex w-full items-center justify-end gap-2 border-t border-base-300 bg-base-100 p-6 pt-4">
-                                        <label for="complaint-drawer-{{ $complaint->id }}"
-                                            class="btn btn-ghost {{ $isFinal ? ' btn btn-primary w-full' : 'flex-1' }}">
-                                            Close
-                                        </label>
+
 
                                         @unless ($isFinal)
                                             <button type="submit" class="btn btn-primary flex-1">

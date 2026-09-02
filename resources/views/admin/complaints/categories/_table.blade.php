@@ -1,5 +1,4 @@
 <div class="px-10 overflow-x-auto">
-
     <table class="table table-md bg-surface">
 
         <thead class="sticky top-0 z-10 bg-gray-700 text-base-content/70 uppercase text-[11px] tracking-wide">
@@ -7,7 +6,8 @@
                 <th class="rounded-tl-xl">Id</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th class="text-center">Complaints</th>
+                <th class="text-center">categorys</th>
+                <th class="text-center">Default Priority</th>
                 <th class="rounded-tr-xl">Action</th>
             </tr>
         </thead>
@@ -33,8 +33,41 @@
 
                     <td class="text-center">
                         <p class="font-bold text-muted-foreground text-xl">
-                            {{ $category->complaints_count }}
+                            {{ $category->categorys_count }}
                         </p>
+                    </td>
+
+
+                    <td>
+                        @php
+                            $priorityClasses = match ($category->default_priority->value) {
+                                'low' => 'bg-green-500/10 text-green-500 border-green-500/20',
+                                'medium' => 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+                                'high' => 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+                                'urgent' => 'bg-red-500/10 text-red-500 border-red-500/20',
+                            };
+                        @endphp
+                        <form method="POST" action="{{ route('admin.categories.update', $category) }}">
+                            @csrf
+                            @method('PATCH')
+
+                            <div class="relative inline-block">
+                                <select name="default_priority" onchange="this.form.submit()"
+                                    class="appearance-none cursor-pointer inline-flex items-center rounded-full border pl-2.5 pr-5 py-1 text-xs font-medium {{ $priorityClasses }}">
+                                    @foreach (App\Enums\ComplaintPriority::cases() as $priority)
+                                        <option value="{{ $priority->value }}" @selected($category->default_priority->value === $priority->value)>
+                                            {{ $priority->label() }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <svg class="pointer-events-none absolute right-1.5 top-1/2 h-2.5 w-2.5 -translate-y-1/2"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                                </svg>
+                            </div>
+
+                        </form>
                     </td>
 
                     <td>
@@ -55,6 +88,12 @@
 
                                     <x-field name="description" type="textarea" label="Description" :value="$category->description" />
 
+                                    <div class="form-control mt-2">
+                                        <label class="label">
+                                            <span class="label-text">Default Priority</span>
+                                        </label>
+
+                                    </div>
                                     <div class="flex mt-2 justify-end">
                                         <x-button type="submit" class="w-full">
                                             Save Changes
@@ -86,7 +125,7 @@
                             @endif
 
                             {{-- Delete --}}
-                            @if ($category->complaints_count)
+                            @if ($category->categorys_count)
                                 <button type="button"
                                     onclick="document.getElementById('delete-category-{{ $category->id }}').showModal()">
                                     <x-icons.trash />

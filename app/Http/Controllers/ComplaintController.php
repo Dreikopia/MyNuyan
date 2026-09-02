@@ -7,8 +7,10 @@ namespace App\Http\Controllers;
 use App\Actions\StoreComplaint;
 use App\Enums\ComplaintStatus;
 use App\Http\Requests\StoreComplaintRequest;
+use App\Models\Admin;
 use App\Models\Complaint;
 use App\Models\ComplaintCategory;
+use App\Notifications\ComplaintSubmitted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -94,10 +96,16 @@ class ComplaintController extends Controller
         $categoryId = session('complaint.category_id');
         abort_unless($categoryId, 400, 'No category selected.');
 
-        $action->handle([
+        $complaint = $action->handle([
             ...$request->validated(),
             'complaint_category_id' => $categoryId,
         ]);
+
+        $admins = Admin::all();
+
+        foreach ($admins as $admin) {
+            $admin->notify(new ComplaintSubmitted($complaint));
+        }
 
         session()->forget('complaint.category_id');
 

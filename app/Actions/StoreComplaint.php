@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\ComplaintStatus;
+use App\Models\Complaint;
+use App\Models\ComplaintCategory;
 use App\Models\ComplaintImage;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -19,15 +21,21 @@ class StoreComplaint
         //
     }
 
-    public function handle(array $attributes): void
+    public function handle(array $attributes): Complaint
     {
+
+        $category = ComplaintCategory::findOrFail($attributes['complaint_category_id']);
+
         $data = collect($attributes)->only([
             'location',
             'description',
             'complaint_category_id',
         ])->toArray();
 
-        DB::transaction(function () use ($data, $attributes) {
+        // Get the priority configured by the admin
+        $data['priority'] = $category->default_priority->value;
+
+        $complaint = DB::transaction(function () use ($data, $attributes) {
             $complaint = $this->user->complaints()->create($data);
 
             $complaint->statusHistories()->create([
@@ -40,6 +48,7 @@ class StoreComplaint
             try {
                 foreach ($attributes['images'] ?? [] as $image) {
                     $path = $image->store('complaints', 'public');
+
                     $storedPaths[] = $path;
 
                     ComplaintImage::create([
@@ -56,6 +65,10 @@ class StoreComplaint
 
                 throw $e;
             }
+
+            return $complaint;
         });
+
+        return $complaint;
     }
 }
