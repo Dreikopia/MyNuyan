@@ -2,7 +2,7 @@
 
     {{-- Logo / Brand area --}}
     <div class="h-16 shrink-0 flex items-center gap-2 px-5 border-b border-base-300">
-        <p class="text-foreground font-semibold text-lg font-kopub">
+        <p class="text-foreground font-semibold text-lg">
             <span class="text-primary">My</span>nuyan
         </p>
     </div>

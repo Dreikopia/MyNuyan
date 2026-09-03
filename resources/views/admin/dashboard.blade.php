@@ -6,12 +6,6 @@
     </x-admin.header>
 
 
-    <div class="card bg-surface max-w-40 h-40 rounded-x-20 rounded-br-20 rounded-br-none mb-10">
-        <div class="card-body">
-            Submitted
-        </div>
-    </div>
-
     <div class="card bg-surface max-w-200">
         <div class="card-body">
 

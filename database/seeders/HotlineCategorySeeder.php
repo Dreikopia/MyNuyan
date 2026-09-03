@@ -15,7 +15,15 @@ class HotlineCategorySeeder extends Seeder
         $categories = [
             'Emergency',
             'Police',
-            'Hospitals',
+            'Fire & Rescue',
+            'Medical',
+            'Barangay',
+            'Disaster & Rescue',
+            'Peace & Order',
+            'Utilities',
+            'Social Services',
+            'Government',
+            'Other',
         ];
 
         foreach ($categories as $category) {

@@ -22,6 +22,6 @@ class Hotline extends Model
 
     public function category()
     {
-        return $this->belongsTo(HotlineCategory::class);
+        return $this->belongsTo(HotlineCategory::class, 'hotline_category_id');
     }
 }

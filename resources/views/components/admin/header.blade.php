@@ -4,7 +4,7 @@
     $hasBreadcrumbs = count($breadcrumbs) > 0;
 @endphp
 
-<header class="fixed top-0 right-0 left-60 z-30 h-16">
+<header class="fixed top-0 right-0 left-60 z-30 h-14">
     <div class="h-full flex items-center justify-between px-6">
         <div>
             <h1 class="text-lg font-semibold flex items-center gap-2">

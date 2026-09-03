@@ -42,7 +42,7 @@ class ComplaintController extends Controller
             ->allowedSorts(...['created_at', 'updated_at'])// ← whitelist these columns
             ->with(['category', 'user', 'images'])
             ->defaultSort('-created_at')
-            ->paginate(20)
+            ->paginate(9)
             ->withQueryString();
 
         $categories = ComplaintCategory::all();
@@ -95,7 +95,7 @@ class ComplaintController extends Controller
             ) // ← add this
             ->with(['category', 'user', 'images'])
             ->defaultSort('-created_at')
-            ->paginate(20)
+            ->paginate(9)
             ->withQueryString();
 
         if ($request->wantsJson()) {

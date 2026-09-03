@@ -27,6 +27,7 @@
                 </td>
                 <td class="max-w-50">
                     <p>{{ $complaint->category->name }}</p>
+                    <p class="text-xs text-muted-foreground line-clamp-1">{{ $complaint->description }}</p>
 
                 </td>
                 <td class="max-w-30">
@@ -78,52 +79,39 @@
                 </td>
 
                 <td>
-                    @if (!$isFinal)
-                        <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
-                            <span class="btn btn-xs btn-outline">
-                                Review
-                            </span>
-                        </label>
-                    @else
-                        <div class="flex items-center gap-6">
-                            <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
-                                <span class="btn btn-xs btn-outline">
-                                    Review
-                                </span>
-                            </label>
-                        </div>
-                    @endif
+
+                    <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
+                        <span class="btn btn-xs btn-outline">
+                            Review
+                        </span>
+                    </label>
+
 
                     <div class="drawer drawer-end">
                         <input id="complaint-drawer-{{ $complaint->id }}" type="checkbox" class="drawer-toggle" />
+
                         <div class="drawer-side z-50">
+                            <label for="complaint-drawer-{{ $complaint->id }}" class="drawer-overlay"></label>
 
-                            <div class="bg-surface min-h-full w-full max-w-xl lg:max-w-2xl flex flex-col">
-                                <div class="flex items-center justify-between border-b border-base-300 p-6 pb-3">
+                            <div class="bg-surface h-full w-full max-w-xl lg:max-w-2xl flex flex-col">
+                                <div class="flex items-center justify-between p-6 pb-3">
 
-
-                                    <div class="flex">
-
-                                        <label for="complaint-drawer-{{ $complaint->id }}">
+                                    <div class="flex items-center gap-2">
+                                        <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
                                             <x-icons.panel-right />
                                         </label>
-
-                                        Expand
-
-                                        <h3 class="text-lg font-bold">
-                                            {{ $complaint->complaint_id }}
-                                        </h3>
+                                        <h3 class="text-lg font-bold">{{ $complaint->complaint_id }}</h3>
                                     </div>
                                     <x-status-badge :status="$complaint->status" />
                                 </div>
 
+
                                 <form method="POST" action="{{ route('admin.complaints.update', $complaint) }}"
-                                    class="flex flex-col flex-1 overflow-hidden">
+                                    class="flex flex-col flex-1 overflow-hidden" x-data="{ selectedStatus: null }">
                                     @csrf
                                     @method('PATCH')
 
-                                    {{-- SCROLLABLE AREA: only this part scrolls if content is long, header/footer stay put --}}
-                                    <div class="flex-1 overflow-y-auto px-6 space-y-4">
+                                    <div class="flex-1 overflow-y-auto px-6 pt-4 space-y-5">
 
                                         <x-admin.complaint-details :complaint="$complaint" />
 
@@ -135,18 +123,17 @@
                                                 placeholder="Send a remarks" label="Remarks" />
                                         @endunless
 
-                                        <div x-data="{ selectedStatus: null }" class="space-y-3">
+                                        <div class="space-y-3">
                                             @if ($complaint->status !== ComplaintStatus::RESOLVED && $complaint->status !== ComplaintStatus::REJECTED)
                                                 <label class="label">
-                                                    <span class="label-text font-semibold text-base">Update
-                                                        Status</span>
+                                                    <span class="text-xs">Update Status</span>
                                                 </label>
                                             @endif
 
                                             @if ($complaint->status === ComplaintStatus::SUBMITTED)
                                                 <label
-                                                    class="relative flex items-center gap-2 card border-2 cursor-pointer p-2.5 transition-all hover:border-primary/60"
-                                                    :class="selectedStatus === 'under_review' ? 'border-primary bg-primary/5' : 'border-base-300'"
+                                                    class="flex items-center gap-2 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-info/60 hover:bg-info/5"
+                                                    :class="selectedStatus === 'under_review' ? 'border-info bg-info/5' : 'border-base-300'"
                                                     @click.prevent="selectedStatus = selectedStatus === 'under_review' ? null : 'under_review'">
                                                     <input type="radio" name="status" value="under_review"
                                                         x-model="selectedStatus" class="sr-only">
@@ -159,85 +146,59 @@
                                                             <path d="m21 21-4.3-4.3" />
                                                         </svg>
                                                     </div>
-                                                    <div class="min-w-0 pr-5">
+                                                    <div class="min-w-0 text-left">
                                                         <p class="font-semibold text-xs">Mark as Under Review</p>
                                                         <p class="text-[11px] text-muted-foreground truncate">Start
                                                             reviewing this complaint</p>
                                                     </div>
-                                                    <svg x-show="selectedStatus === 'under_review'"
-                                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-primary"
-                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="2.5">
-                                                        <path d="M20 6 9 17l-5-5" />
-                                                    </svg>
                                                 </label>
                                             @elseif ($complaint->status === ComplaintStatus::UNDER_REVIEW)
                                                 <div class="grid grid-cols-2 gap-2">
                                                     <label
-                                                        class="relative flex flex-col items-start gap-1.5 card border-2 cursor-pointer p-2.5 transition-all hover:border-error/60"
+                                                        class="flex flex-col items-start text-left gap-1.5 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-error/60 hover:bg-error/5"
                                                         :class="selectedStatus === 'rejected' ? 'border-error bg-error/5' : 'border-base-300'"
                                                         @click.prevent="selectedStatus = selectedStatus === 'rejected' ? null : 'rejected'">
                                                         <input type="radio" name="status" value="rejected"
                                                             x-model="selectedStatus" class="sr-only">
-                                                        <div class="flex items-center justify-between w-full">
-                                                            <div
-                                                                class="flex items-center justify-center size-7 rounded-full bg-error/10 text-error shrink-0">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
-                                                                    viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2">
-                                                                    <path d="M18 6 6 18M6 6l12 12" />
-                                                                </svg>
-                                                            </div>
-                                                            <svg x-show="selectedStatus === 'rejected'"
-                                                                class="size-4 text-error"
-                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                                fill="none" stroke="currentColor"
-                                                                stroke-width="2.5">
+                                                        <div
+                                                            class="flex items-center justify-center size-7 rounded-full bg-error/10 text-error shrink-0">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
+                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                                stroke-width="2">
                                                                 <path d="M18 6 6 18M6 6l12 12" />
                                                             </svg>
                                                         </div>
-                                                        <div class="min-w-0">
+                                                        <div class="min-w-0 text-left">
                                                             <p class="font-semibold text-xs">Reject</p>
-                                                            <p class="text-[11px] text-muted-foreground truncate">Not a
-                                                                valid complaint</p>
+                                                            <p class="text-[11px] text-muted-foreground truncate">
+                                                                Not a valid complaint</p>
                                                         </div>
                                                     </label>
+
                                                     <label
-                                                        class="relative flex flex-col items-start gap-1.5 card border-2 cursor-pointer p-2.5 transition-all hover:border-success/60"
+                                                        class="flex flex-col items-start text-left gap-1.5 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-success/60 hover:bg-success/5"
                                                         :class="selectedStatus === 'in_progress' ? 'border-success bg-success/5' : 'border-base-300'"
                                                         @click.prevent="selectedStatus = selectedStatus === 'in_progress' ? null : 'in_progress'">
                                                         <input type="radio" name="status" value="in_progress"
                                                             x-model="selectedStatus" class="sr-only">
-                                                        <div class="flex items-center justify-between w-full">
-                                                            <div
-                                                                class="flex items-center justify-center size-7 rounded-full bg-success/10 text-success shrink-0">
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                    class="size-3.5" viewBox="0 0 24 24"
-                                                                    fill="none" stroke="currentColor"
-                                                                    stroke-width="2">
-                                                                    <path d="M20 6 9 17l-5-5" />
-                                                                </svg>
-                                                            </div>
-                                                            <svg x-show="selectedStatus === 'in_progress'"
-                                                                class="size-4 text-success"
-                                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                                fill="none" stroke="currentColor"
-                                                                stroke-width="2.5">
+                                                        <div
+                                                            class="flex items-center justify-center size-7 rounded-full bg-success/10 text-success shrink-0">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2">
                                                                 <path d="M20 6 9 17l-5-5" />
                                                             </svg>
                                                         </div>
-                                                        <div class="min-w-0">
+                                                        <div class="min-w-0 text-left">
                                                             <p class="font-semibold text-xs">Approve</p>
-                                                            <p class="text-[11px] text-muted-foreground truncate">Move
-                                                                to In Progress</p>
+                                                            <p class="text-[11px] text-muted-foreground truncate">
+                                                                Move to In Progress</p>
                                                         </div>
                                                     </label>
-
-
                                                 </div>
                                             @elseif ($complaint->status === ComplaintStatus::IN_PROGRESS)
                                                 <label
-                                                    class="relative flex items-center gap-2 card border-2 cursor-pointer p-2.5 transition-all hover:border-success/60"
+                                                    class="flex items-center gap-2 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-success/60 hover:bg-success/5"
                                                     :class="selectedStatus === 'resolved' ? 'border-success bg-success/5' : 'border-base-300'"
                                                     @click.prevent="selectedStatus = selectedStatus === 'resolved' ? null : 'resolved'">
                                                     <input type="radio" name="status" value="resolved"
@@ -251,21 +212,21 @@
                                                                 d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                                         </svg>
                                                     </div>
-                                                    <div class="min-w-0 pr-5">
+                                                    <div class="min-w-0 text-left">
                                                         <p class="font-semibold text-xs">Mark as Resolved</p>
                                                         <p class="text-[11px] text-muted-foreground truncate">This
                                                             complaint has been addressed</p>
                                                     </div>
-                                                    <svg x-show="selectedStatus === 'resolved'"
-                                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-success"
-                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="2.5">
-                                                        <path d="M20 6 9 17l-5-5" />
-                                                    </svg>
                                                 </label>
                                             @endif
 
-                                            <x-admin.status-banner />
+                                            <div class="grid transition-all duration-300 ease-out" :class="selectedStatus
+                                                ? 'grid-rows-[1fr] opacity-100 mt-2'
+                                                : 'grid-rows-[0fr] opacity-0 mt-0'">
+                                                <div class="overflow-hidden">
+                                                    <x-admin.status-banner />
+                                                </div>
+                                            </div>
                                         </div>
 
                                         @if ($complaint->statusHistories->isNotEmpty())
@@ -282,11 +243,10 @@
                                         class="sticky bottom-0 z-10 flex w-full items-center justify-end gap-2 border-t border-base-300 bg-base-100 p-6 pt-4">
 
 
-                                        @unless ($isFinal)
-                                            <button type="submit" class="btn btn-primary flex-1">
-                                                Save changes
-                                            </button>
-                                        @endunless
+                                        <button type="submit" class="btn flex-1" :class="selectedStatus ? 'btn-primary' : 'btn-disabled'"
+                                            :disabled="!selectedStatus">
+                                            Save changes
+                                        </button>
                                     </div>
                                 </form>
                             </div>
