@@ -20,6 +20,8 @@ class ComplaintController extends Controller
 {
     public function index(Request $request)
     {
+        $perPage = (int) $request->input('per_page', 10);
+
         $complaints = QueryBuilder::for(Complaint::active())
             ->allowedFilters(
                 AllowedFilter::exact('status'),
@@ -39,25 +41,15 @@ class ComplaintController extends Controller
                     });
                 }),
             )
-            ->allowedSorts(...['created_at', 'updated_at'])// ← whitelist these columns
+            ->allowedSorts(...['created_at', 'updated_at'])
             ->with(['category', 'user', 'images'])
             ->defaultSort('-created_at')
-            ->paginate(9)
-            ->withQueryString();
+            ->paginate($perPage)
+            ->withQueryString(); // keeps ?filter[status]=... etc. on every pagination link automatically
 
         $categories = ComplaintCategory::all();
         $selectedCategory = $request->input('filter.complaint_category_id');
         $statusCounts = Complaint::allStatusCounts($selectedCategory);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'html' => view('admin.complaints._table', [
-                    'complaints' => $complaints,
-                    'categories' => $categories,   // now available if _table needs it
-                ])->render(),
-                'pagination' => $complaints->links('vendor.pagination.compact')->render(),
-            ]);
-        }
 
         return view('admin.complaints.index', [
             'complaints' => $complaints,
@@ -69,6 +61,9 @@ class ComplaintController extends Controller
 
     public function archived(Request $request)
     {
+
+        $perPage = (int) $request->input('per_page', 10);
+
         $complaints = QueryBuilder::for(Complaint::archived())
             ->allowedFilters(
                 AllowedFilter::exact('status'),
@@ -92,10 +87,10 @@ class ComplaintController extends Controller
                 'created_at',
                 'updated_at',
                 'priority',
-            ) // ← add this
+            )
             ->with(['category', 'user', 'images'])
             ->defaultSort('-created_at')
-            ->paginate(9)
+            ->paginate($perPage)
             ->withQueryString();
 
         if ($request->wantsJson()) {

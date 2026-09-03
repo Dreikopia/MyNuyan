@@ -16,6 +16,7 @@ class ComplaintCategoryController extends Controller
 {
     public function index(Request $request)
     {
+        $perPage = (int) $request->input('per_page', 10);
         $categories = QueryBuilder::for(
             ComplaintCategory::query()
                 ->where('is_archived', false)
@@ -30,7 +31,7 @@ class ComplaintCategoryController extends Controller
                 }),
             )
             ->defaultSort('-created_at')
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         if ($request->wantsJson()) {
@@ -62,7 +63,7 @@ class ComplaintCategoryController extends Controller
                 }),
             )
             ->defaultSort('-created_at')
-            ->paginate(10)
+            ->paginate()
             ->withQueryString();
 
         if ($request->wantsJson()) {

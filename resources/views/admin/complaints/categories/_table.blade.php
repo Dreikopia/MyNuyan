@@ -1,4 +1,4 @@
-<table class="table table-md bg-surface">
+<table class="table table-md bg-surface w-full">
 
     <thead class="sticky top-0 z-10 bg-gray-700 text-base-content/70 uppercase text-[11px] tracking-wide">
         <tr>
@@ -25,7 +25,7 @@
                 </td>
 
                 <td class="max-w-50">
-                    <p class="text-sm text-muted-foreground">
+                    <p class="text-sm text-muted-foreground line-clamp-1">
                         {{ $category->description }}
                     </p>
                 </td>

@@ -153,18 +153,14 @@
                 <x-icons.back />
                 Active Complaints
             </a>
-
         </div>
 
-        {{-- Table (this is the ONLY part that scrolls) --}}
-        <div class="relative flex-1 min-h-0">
-
-            {{-- Loading Overlay --}}
+        {{-- Table (height-capped, scrolls internally) --}}
+        <div class="relative max-h-[470px]">
             <div x-show="loading" x-transition.opacity
                 class="absolute inset-0 bg-base-100/60 flex items-center justify-center z-20 rounded-md">
                 <span class="loading loading-spinner loading-sm"></span>
             </div>
-
             <div class="h-full overflow-y-auto rounded-md scrollbar-thin border border-base-300">
                 <div id="complaints-table">
                     @include('admin.complaints._table', [
@@ -173,8 +169,55 @@
                     ])
                 </div>
             </div>
+              <div class="flex items-center justify-between mt-2 shrink-0">
+            <div class="flex items-center gap-1 text-[11px]">
+                <span class="text-base-content/60">Rows:</span>
+                <select
+                    class="select select-xs select-bordered"
+                    onchange="window.location.href = updateQueryParam(window.location.href, 'per_page', this.value)">
+                    @foreach ([10, 25, 50] as $option)
+                        <option value="{{ $option }}" @selected(request('per_page', 10) == $option)>
+                            {{ $option }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- MIDDLE: "X-Y of Z" count --}}
+            <span class="text-[11px] text-base-content/60">
+                @if ($complaints->total() > 0)
+                    {{ $complaints->firstItem() }}-{{ $complaints->lastItem() }} of {{ $complaints->total() }}
+                @else
+                    0 results
+                @endif
+            </span>
+
+            {{-- RIGHT: daisyUI join prev/next --}}
+            <div class="join">
+                <a href="{{ $complaints->previousPageUrl() ?? '#' }}"
+                   class="join-item btn btn-xs btn-outline {{ $complaints->onFirstPage() ? 'btn-disabled' : '' }}">
+                    Previous page
+                </a>
+                <a href="{{ $complaints->nextPageUrl() ?? '#' }}"
+                   class="join-item btn btn-xs btn-outline {{ !$complaints->hasMorePages() ? 'btn-disabled' : '' }}">
+                    Next
+                </a>
+            </div>
 
         </div>
 
     </div>
+        </div>
+
+        {{-- Pagination bar (sibling of the table box, always below it) --}}
+      
+
+    <script>
+        function updateQueryParam(url, key, value) {
+            const u = new URL(url);
+            u.searchParams.set(key, value);
+            u.searchParams.set('page', 1);
+            return u.toString();
+        }
+    </script>
 @endsection

@@ -18,35 +18,49 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        $news = QueryBuilder::for(News::class)
+        $news = QueryBuilder::for(
+            News::query()->with('category')
+        )
             ->allowedFilters(...[
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where(function ($query) use ($value) {
                         $query->where('title', 'like', "%{$value}%")
-                            ->orWhere('description', 'like', "%{$value}%")
-                            ->orWhereHas('category', function ($query) use ($value) {
-                                $query->where('name', 'like', "%{$value}%");
-                            });
+                            ->orWhere('description', 'like', "%{$value}%");
                     });
                 }),
-                AllowedFilter::exact('category', 'news_category_id'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::callback('news_category_id', function ($query, $value) {
+                    $query->where('news_category_id', $value);
+                }),
             ])
-            ->allowedSorts(...['created_at', 'updated_at', 'title'])
+            ->allowedSorts(...[
+                'created_at',
+                'updated_at',
+            ])
             ->defaultSort('-created_at')
             ->get();
+
+        $categories = NewsCategory::orderBy('name')->get();
+
+        $statusCounts = [
+            'all' => News::count(),
+            'published' => News::where('status', 'published')->count(),
+            'draft' => News::where('status', 'draft')->count(),
+        ];
 
         if ($request->wantsJson()) {
             return response()->json([
                 'html' => view('admin.news.partials._grid', [
                     'news' => $news,
                 ])->render(),
+                'statusCounts' => $statusCounts,
             ]);
         }
 
         return view('admin.news.index', [
-            'categories' => NewsCategory::all(),
             'news' => $news,
+            'categories' => $categories,
+            'statusCounts' => $statusCounts,
         ]);
     }
 
@@ -70,7 +84,7 @@ class NewsController extends Controller
 
         Auth::guard('admin')->user()->news()->create([
             'title' => $validated['title'],
-            'news_category_id' => $validated['category'],
+            'news_news_category_id' => $validated['category'],
             'status' => $validated['status'],
             'description' => $validated['description'],
             'image_path' => $imagePath,
@@ -100,7 +114,7 @@ class NewsController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'status' => $validated['status'],
-            'news_category_id' => $validated['category'],
+            'news_news_category_id' => $validated['category'],
         ]);
 
         return redirect()
@@ -114,7 +128,7 @@ class NewsController extends Controller
             Storage::disk('public')->delete($news->image_path);
         }
 
-        $news->delete();
+        $news->delete($news);
 
         return redirect()
             ->route('admin.news')

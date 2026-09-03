@@ -6,7 +6,7 @@
     $modalName = $isEditing ? 'Edit' : 'Create';
 @endphp
 
-<x-modal :id="$modalId" :name="$modalName" boxClass="max-w-2xl bg-surface" :trigger="!$isEditing" class="btn btn-primary">
+<x-modal :id="$modalId" :name="$modalName" boxClass="max-w-2xl bg-surface" :trigger="!$isEditing" class="btn btn-primary/10">
 
     <form x-data="{
         errors: {},

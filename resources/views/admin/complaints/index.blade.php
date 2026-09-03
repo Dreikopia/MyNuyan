@@ -8,36 +8,25 @@ use App\Enums\ComplaintPriority;
 @section('content')
 <x-admin.header title="Complaints">
 
-    {{-- plain <a> instead of <x-button>, styled the same way with daisyUI classes --}}
     <a href="{{ route('admin.categories') }}" class="btn btn-sm bg-primary/50 rounded-t-xl rounded-bl-xl rounded-br-none">
         Manage Categories
     </a>
 
-    {{-- plain bell icon instead of <x-icons.notifications> --}}
-    <button type="button" class="relative">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" />
-        </svg>
-    </button>
+<x-icons.notification/>
 
 </x-admin.header>
 
 
 <div x-data="{
-    // ---- filter values (read from the URL on first load, so refreshing keeps your filters) ----
     search: @js(request('filter.search', '')),
     status: @js(request('filter.status', '')),
     category: @js(request('filter.complaint_category_id', '')),
     priority: @js(request('filter.priority', '')),
     sort: @js(request('sort', '-created_at')),
 
-    // ---- pagination values ----
     perPage: @js((int) request('per_page', 10)),
     page: @js((int) request('page', 1)),
 
-    // ---- which popover is currently open (only one at a time) ----
     statusOpen: false,
     categoryOpen: false,
     priorityOpen: false,
@@ -46,7 +35,6 @@ use App\Enums\ComplaintPriority;
 
     loading: false,
 
-    // ---- info about the current page of results, filled in from the server after every fetch ----
     meta: {
         from: {{ $complaints->firstItem() ?? 0 }},
         to: {{ $complaints->lastItem() ?? 0 }},
@@ -54,7 +42,6 @@ use App\Enums\ComplaintPriority;
         lastPage: {{ $complaints->lastPage() }},
     },
 
-    // ---- human-readable labels, built once from the PHP enums/collections ----
     statusLabels: @js(collect(ComplaintStatus::cases())->mapWithKeys(fn($s) => [$s->value => $s->label()])),
     categoryLabels: @js($categories->pluck('name', 'id')),
     priorityLabels: @js(collect(ComplaintPriority::cases())->mapWithKeys(fn($p) => [$p->value => $p->label()])),
@@ -64,7 +51,6 @@ use App\Enums\ComplaintPriority;
         '-updated_at': 'Date Modified'
     },
 
-    // ---- computed helpers ----
     get canGoPrev() { return this.page > 1; },
     get canGoNext() { return this.page < this.meta.lastPage; },
 
@@ -403,9 +389,6 @@ use App\Enums\ComplaintPriority;
 
 </div>
 
-
-{{-- View Archived --}}
-
     <a href="{{ route('admin.complaints.archived') }}"
     class="btn btn-sm btn-outline shrink-0">
 
@@ -424,11 +407,7 @@ use App\Enums\ComplaintPriority;
 </a>
 </div>
 
-
-
-    {{-- Table (this is the ONLY part that scrolls) --}}
-    <div class="relative flex-1 min-h-0"> {{-- CHANGE #3: was "relative" only, now flex-1 min-h-0 --}}
-
+    <div class="relative max-h-[470px]"> 
         <div x-show="loading" x-transition.opacity
             class="absolute inset-0 bg-base-100/60 flex items-center justify-center z-20 rounded-md">
             <span class="loading loading-spinner loading-sm"></span>
@@ -438,67 +417,56 @@ use App\Enums\ComplaintPriority;
             <div id="complaints-table">
                 @include('admin.complaints._table')
             </div>
-        </div>
+            <div class="flex items-center justify-between mt-2 shrink-0">
 
+ <div class="flex items-center gap-1 text-[11px]">
+        <span class="text-base-content/60">Rows:</span>
+        <select
+            class="select select-xs select-bordered"
+            onchange="window.location.href = updateQueryParam(window.location.href, 'per_page', this.value)">
+            @foreach ([10, 25, 50] as $option)
+                <option value="{{ $option }}" @selected(request('per_page', 10) == $option)>
+                    {{ $option }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
+    <span class="text-[11px] text-base-content/60">
+        @if ($complaints->total() > 0)
+            {{ $complaints->firstItem() }}-{{ $complaints->lastItem() }} of {{ $complaints->total() }}
+        @else
+            0 results
+        @endif
+    </span>
 
-    {{-- Pagination bar --}}
-    <div class="flex items-center justify-between mt-2 shrink-0"> {{-- CHANGE #4: added shrink-0 --}}
+    {{-- RIGHT: daisyUI join prev/next --}}
+    <div class="join">
+        <a href="{{ $complaints->previousPageUrl() ?? '#' }}"
+           class="join-item btn btn-sm btn-outline {{ $complaints->onFirstPage() ? 'btn-disabled' : '' }}">
+            Previous page
+        </a>
+        <a href="{{ $complaints->nextPageUrl() ?? '#' }}"
+           class="join-item btn btn-sm btn-outline {{ !$complaints->hasMorePages() ? 'btn-disabled' : '' }}">
+            Next
+        </a>
+    </div>
 
-        <span class="text-[11px] text-base-content/60">
-            <template x-if="meta.total > 0">
-                <span>
-                    <span x-text="meta.from"></span>-<span x-text="meta.to"></span> of <span
-                        x-text="meta.total"></span>
-                </span>
-            </template>
-            <template x-if="meta.total === 0">
-                <span>0 results</span>
-            </template>
-        </span>
-
-        <div class="flex items-center gap-1.5">
-
-            <div class="relative">
-                <button type="button" @click="perPageOpen = !perPageOpen"
-                    class="flex items-center gap-1 bg-base-200 rounded-full px-2.5 py-1 text-[11px] hover:bg-base-300">
-                    <span x-text="perPage + ' / page'"></span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-60" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
-
-                <div x-show="perPageOpen" x-cloak @click.outside="perPageOpen = false" x-transition
-                    class="absolute bottom-full right-0 mb-2 w-20 bg-base-100 border border-base-300 rounded-box shadow-lg py-1 z-30">
-
-                    <template x-for="opt in [10, 25, 50]" :key="opt">
-                        <button type="button" @click="perPage = opt; perPageOpen = false; changePerPage()"
-                            :class="perPage === opt ? 'bg-base-200 font-medium' : 'hover:bg-base-200'" class="w-full text-left px-3 py-1 text-[11px]" x-text="opt"></button>
-                    </template>
-
-                </div>
-            </div>
-
-            <button type="button" @click="prevPage()" :disabled="!canGoPrev" :class="!canGoPrev ? 'opacity-30 cursor-not-allowed' : 'hover:bg-base-300'"
-                class="w-6 h-6 flex items-center justify-center rounded-full bg-base-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m15 18-6-6 6-6" />
-                </svg>
-            </button>
-
-            <button type="button" @click="nextPage()" :disabled="!canGoNext" :class="!canGoNext ? 'opacity-30 cursor-not-allowed' : 'hover:bg-base-300'"
-                class="w-6 h-6 flex items-center justify-center rounded-full bg-base-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m9 18 6-6-6-6" />
-                </svg>
-            </button>
-
+</div>
         </div>
     </div>
+
+
+<script>
+    function updateQueryParam(url, key, value) {
+        const u = new URL(url);
+        u.searchParams.set(key, value);
+        u.searchParams.set('page', 1);
+        return u.toString();
+    }
+</script>
+
+</div>
 
 </div>
 @endsection

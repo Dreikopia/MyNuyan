@@ -25,6 +25,7 @@
         }
     }">
 
+        {{-- Toolbar --}}
         <div class="px-10 py-4 flex items-center justify-between">
 
             <input type="search" x-model="search" x-on:input.debounce.400ms="fetchResults()"
@@ -38,7 +39,8 @@
 
         </div>
 
-        <div id="complaint-categories-table">
+        {{-- Table --}}
+        <div id="complaint-categories-table" class="px-10">
             @include('admin.complaints.categories._table', [
                 'categories' => $categories,
                 'archivedView' => true,
