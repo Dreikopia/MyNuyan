@@ -33,7 +33,6 @@ class UpdateComplaintCategory extends FormRequest
                 Rule::unique('complaint_categories', 'name')
                     ->ignore($category->id),
             ],
-            'description' => 'sometimes|string|max:500',
             'default_priority' => ['sometimes', Rule::enum(ComplaintPriority::class)],
         ];
     }

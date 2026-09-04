@@ -12,14 +12,18 @@ class NewsCategoryController extends Controller
 {
     public function index()
     {
+        $categories = NewsCategory::query()
+            ->withCount('news')
+            ->latest()
+            ->paginate(10);
+
         return view('admin.news.categories.index', [
-            'categories' => NewsCategory::all(),
+            'categories' => $categories,
         ]);
     }
 
     public function store(Request $request)
     {
-
         $validated = $request->validate([
             'name' => 'required|max:255',
         ]);
@@ -28,6 +32,8 @@ class NewsCategoryController extends Controller
             'name' => $validated['name'],
         ]);
 
-        return redirect()->route('admin.news.categories');
+        return redirect()
+            ->route('admin.news.categories')
+            ->with('success', 'Category has been added!');
     }
 }

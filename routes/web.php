@@ -5,11 +5,12 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\ComplaintCategoryController as AdminComplaintCategoryController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\HotlineController;
+use App\Http\Controllers\Admin\HotlineController as AdminHotlineController;
 use App\Http\Controllers\Admin\NewsCategoryController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\HotlineController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -52,8 +53,8 @@ Route::middleware('is_admin')
         Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.delete');
         Route::get('/news/category', [NewsCategoryController::class, 'index'])->name('news.categories');
 
-        Route::get('/hotlines', [HotlineController::class, 'index'])->name('hotlines.index');
-        Route::post('/hotlines', [HotlineController::class, 'store'])->name('hotlines.store');
+        Route::get('/hotlines', [AdminHotlineController::class, 'index'])->name('hotlines.index');
+        Route::post('/hotlines', [AdminHotlineController::class, 'store'])->name('hotlines.store');
     });
 
 Route::middleware('is_resident')

@@ -114,7 +114,7 @@ class NewsController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'status' => $validated['status'],
-            'news_news_category_id' => $validated['category'],
+            'news_category_id' => $validated['category'],
         ]);
 
         return redirect()

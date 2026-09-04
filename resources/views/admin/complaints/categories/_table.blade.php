@@ -4,8 +4,7 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
-            <th>Description</th>
-            <th class="text-center">categorys</th>
+            <th class="text-center">Complaints</th>
             <th class="text-center">Default Priority</th>
             <th>Action</th>
         </tr>
@@ -26,13 +25,7 @@
 
                 <td class="max-w-50">
                     <p class="text-sm text-muted-foreground line-clamp-1">
-                        {{ $category->description }}
-                    </p>
-                </td>
-
-                <td class="text-center">
-                    <p class="font-bold text-muted-foreground text-xl">
-                        {{ $category->categorys_count }}
+                        {{ $category->complaints->count() }}
                     </p>
                 </td>
 

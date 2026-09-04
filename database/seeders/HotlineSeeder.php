@@ -8,66 +8,63 @@ use Illuminate\Database\Seeder;
 
 class HotlineSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $hotlines = [
             [
                 'category' => 'Emergency',
                 'name' => 'National Emergency Hotline',
-                'phone_number' => '911',
+                'location' => 'Philippines',
             ],
             [
                 'category' => 'Police',
                 'name' => 'Minuyan Proper Police Station',
-                'phone_number' => '0998 598 8110',
+                'location' => 'Minuyan Proper',
             ],
             [
                 'category' => 'Fire & Rescue',
                 'name' => 'Bureau of Fire Protection',
-                'phone_number' => '(044) 931 0084',
+                'location' => 'Minuyan Proper',
             ],
             [
                 'category' => 'Medical',
                 'name' => 'Emergency Medical Services',
-                'phone_number' => '911',
+                'location' => 'Minuyan Proper',
             ],
             [
                 'category' => 'Barangay',
                 'name' => 'Barangay Hall',
-                'phone_number' => '0912 345 6789',
+                'location' => 'Barangay Minuyan Proper II',
             ],
             [
                 'category' => 'Disaster & Rescue',
                 'name' => 'MDRRMO',
-                'phone_number' => '0917 123 4567',
+                'location' => 'San Jose del Monte',
             ],
             [
                 'category' => 'Peace & Order',
                 'name' => 'Barangay Peace and Order',
-                'phone_number' => '0918 234 5678',
+                'location' => 'Barangay Minuyan Proper II',
             ],
             [
                 'category' => 'Utilities',
                 'name' => 'Water & Utility Services',
-                'phone_number' => '1627',
+                'location' => 'Minuyan Proper',
             ],
             [
                 'category' => 'Social Services',
                 'name' => 'DSWD Assistance',
-                'phone_number' => '(02) 8733 0010',
+                'location' => 'Bulacan',
             ],
             [
                 'category' => 'Government',
                 'name' => 'City Government Hotline',
-                'phone_number' => '1234',
+                'location' => 'San Jose del Monte',
             ],
             [
                 'category' => 'Other',
                 'name' => 'Community Assistance',
-                'phone_number' => '0919 345 6789',
+                'location' => 'Barangay Minuyan Proper II',
             ],
         ];
 
@@ -86,9 +83,9 @@ class HotlineSeeder extends Seeder
                     'name' => $hotline['name'],
                 ],
                 [
-                    'admin_id' => 1,
-                    'hotline_category_id' => $category->id,
-                    'phone_number' => $hotline['phone_number'],
+                    'category_id' => $category->id,
+                    'location' => $hotline['location'],
+                    'is_active' => true,
                 ]
             );
         }

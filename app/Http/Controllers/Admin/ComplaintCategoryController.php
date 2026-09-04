@@ -25,8 +25,7 @@ class ComplaintCategoryController extends Controller
             ->allowedFilters(
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('name', 'like', "%{$value}%")
-                            ->orWhere('description', 'like', "%{$value}%");
+                        $query->where('name', 'like', "%{$value}%");
                     });
                 }),
             )
@@ -57,8 +56,7 @@ class ComplaintCategoryController extends Controller
             ->allowedFilters(
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->where(function ($query) use ($value) {
-                        $query->where('name', 'like', "%{$value}%")
-                            ->orWhere('description', 'like', "%{$value}%");
+                        $query->where('name', 'like', "%{$value}%");
                     });
                 }),
             )
@@ -86,7 +84,6 @@ class ComplaintCategoryController extends Controller
 
         ComplaintCategory::create([
             'name' => $validated['category_name'],
-            'description' => $validated['description'],
         ]);
 
         return redirect()

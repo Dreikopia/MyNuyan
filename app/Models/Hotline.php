@@ -24,4 +24,9 @@ class Hotline extends Model
     {
         return $this->belongsTo(HotlineCategory::class, 'hotline_category_id');
     }
+
+    public function numbers()
+    {
+        return $this->hasMany(HotlineNumber::class);
+    }
 }

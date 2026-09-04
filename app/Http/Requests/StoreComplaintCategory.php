@@ -24,7 +24,6 @@ class StoreComplaintCategory extends FormRequest
     {
         return [
             'category_name' => 'required|max:100|unique:complaint_categories,name',
-            'description' => 'nullable|max:100',
         ];
     }
 }

@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Hotline;
 use Illuminate\Http\Request;
 
 class HotlineController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('resident.hotline');
+
+        return view('resident.hotlines.index', [
+            'hotlines' => Hotline::all(),
+        ]);
     }
 
     /**
