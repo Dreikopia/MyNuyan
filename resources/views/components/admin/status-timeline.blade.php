@@ -5,13 +5,12 @@
         'submitted' => 'Submitted',
         'under_review' => 'Under Review',
         'in_progress' => 'In Progress',
-        'pending_confirmation' => 'Pending Confirmation',
         'resolved' => 'Resolved',
         'rejected' => 'Rejected',
     ];
 @endphp
 
-<ul class="timeline timeline-vertical timeline-compact">
+<ul class="timeline timeline-vertical timeline-compact timeline-snap-icon">
 
     @forelse ($histories as $history)
         @php
@@ -21,40 +20,41 @@
         <li>
 
             @if (!$loop->first)
-                <hr class="bg-primary" />
+                <hr class="bg-primary w-px!" />
             @endif
 
             <div class="timeline-middle">
-                <span class="inline-block h-4 w-4 rounded-full bg-primary ring ring-base-100"></span>
+                <span class="block size-2 rounded-full bg-primary"></span>
             </div>
 
-            <div class="timeline-end timeline-box">
-                <p class="font-semibold text-sm">
+            <div class="timeline-end pb-5 pl-1">
+                <p class="text-sm font-semibold leading-none">
                     {{ $label }}
                 </p>
 
-                <p class="text-xs text-base-content/60 mt-0.5">
+                <p class="text-xs text-base-content/60 mt-1.5">
                     {{ $history->changedBy?->username ?? 'System' }}
                     · {{ $history->created_at->format('M d, Y - h:i A') }}
                 </p>
 
                 @if ($history->remarks)
-                    <p class="text-sm mt-1">
+                    <p class="text-sm mt-1.5">
                         {{ $history->remarks }}
                     </p>
                 @endif
             </div>
 
             @if (!$loop->last)
-                <hr class="bg-primary" />
+                <hr class="bg-primary w-px!" />
             @endif
 
         </li>
 
     @empty
 
-        <li class="text-sm text-base-content/50 pl-2">
+        <li class="text-sm text-base-content/50">
             No status history yet.
         </li>
     @endforelse
+
 </ul>

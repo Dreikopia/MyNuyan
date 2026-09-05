@@ -29,7 +29,6 @@
                     </p>
                 </td>
 
-
                 <td>
                     @php
                         $priorityClasses = match ($category->default_priority->value) {

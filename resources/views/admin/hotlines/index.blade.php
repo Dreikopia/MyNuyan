@@ -50,7 +50,7 @@
                             </svg>
                         </div>
 
-                        <span class="badge {{ $isActive ? 'badge-success' : 'badge-ghost' }} gap-1">
+                        <span class="badge {{ $isActive ? ' badge-soft badge-sm badge-success' : 'badge-ghost' }} gap-1">
                             <span
                                 class="size-1.5 rounded-full {{ $isActive ? 'bg-success' : 'bg-base-content/40' }}"></span>
                             {{ $isActive ? 'Active' : 'Inactive' }}
@@ -131,9 +131,20 @@
 
                     {{-- Bottom actions --}}
                     <div class="flex gap-2 mt-auto pt-2">
-                        <a href="" class="btn btn-sm btn-outline flex-1">
+
+                        <label type="button" for="hotline-drawer-{{ $hotline->id }}"
+                            class="btn btn-sm btn-outline flex-1 pointer-cursor">
                             View
-                        </a>
+                        </label>
+
+                        <x-admin.drawer id="hotline-drawer-{{ $hotline->id }}" :title="$hotline->name">
+                            <x-slot:header>
+                                <span class="badge badge-success">
+                                    Active
+                                </span>
+                            </x-slot:header>
+                        </x-admin.drawer>
+
                         <label for="edit-hotline-{{ $hotline->id }}" class="btn btn-sm btn-primary flex-1 cursor-pointer">
                             Edit
                         </label>
@@ -141,7 +152,7 @@
                 </div>
             </div>
 
-            {{-- Edit modal --}}
+
             <x-modal id="edit-hotline-{{ $hotline->id }}" name="" class="hidden" boxClass="bg-surface">
                 <h3 class="font-bold text-lg mb-4">Edit hotline</h3>
                 <form method="POST" action="">
@@ -176,4 +187,7 @@
             </div>
         @endforelse
     </div>
+
+
+
 @endsection

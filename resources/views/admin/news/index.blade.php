@@ -353,12 +353,11 @@
                 <span class="loading loading-spinner loading-sm"></span>
             </div>
 
-            <div class="h-full overflow-y-auto rounded-md scrollbar-thin">
+            <div class="h-full overflow-y-auto rounded-md scrollbar-thin p-5">
 
                 <div
                     id="news-grid"
-                    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
-                >
+                    class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     @include('admin.news.partials._grid', ['news' => $news])
                 </div>
 

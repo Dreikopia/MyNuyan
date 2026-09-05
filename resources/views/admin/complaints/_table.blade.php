@@ -87,171 +87,149 @@
                     </label>
 
 
-                    <div class="drawer drawer-end">
-                        <input id="complaint-drawer-{{ $complaint->id }}" type="checkbox" class="drawer-toggle" />
+                    <x-admin.drawer id="complaint-drawer-{{ $complaint->id }}">
+                        <form method="POST" action="{{ route('admin.complaints.update', $complaint) }}"
+                            class="flex flex-col flex-1 overflow-hidden" x-data="{ selectedStatus: null }">
+                            @csrf
+                            @method('PATCH')
 
-                        <div class="drawer-side z-50">
-                            <label for="complaint-drawer-{{ $complaint->id }}" class="drawer-overlay"></label>
+                            <div class="relative flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-5">
 
-                            <div class="bg-surface h-full w-full max-w-xl lg:max-w-2xl flex flex-col">
-                                <div class="flex items-center justify-between p-6 pb-3">
+                                <x-admin.complaints-details :complaint="$complaint" />
 
-                                    <div class="flex items-center gap-2">
-                                        <label for="complaint-drawer-{{ $complaint->id }}" class="cursor-pointer">
-                                            <x-icons.panel-right />
-                                        </label>
-                                        <h3 class="text-lg font-bold">{{ $complaint->complaint_id }}</h3>
+                                <x-admin.complaints-images :complaint="$complaint" />
+
+                                @if ($isFinal)
+                                    {{-- Closed notice --}}
+                                    <div
+                                        class="flex items-center gap-3 rounded-2xl border border-dashed border-base-300 bg-base-200/40 px-4 py-3">
+                                        <div
+                                            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-base-300/60 text-base-content/60">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect width="18" height="11" x="3" y="11" rx="2" />
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-semibold text-base-content">This complaint is closed
+                                            </p>
+                                            <p class="text-xs text-base-content/50">
+                                                Marked as {{ $complaint->status->label() }} — no further updates can be
+                                                made.
+                                            </p>
+                                        </div>
                                     </div>
-                                    <x-status-badge :status="$complaint->status" />
-                                </div>
-
-
-                                <form method="POST" action="{{ route('admin.complaints.update', $complaint) }}"
-                                    class="flex flex-col flex-1 overflow-hidden" x-data="{ selectedStatus: null }">
-                                    @csrf
-                                    @method('PATCH')
-
-                                    <div class="flex-1 overflow-y-auto px-6 pt-4 space-y-5">
-
-                                        <x-admin.complaint-details :complaint="$complaint" />
-
-                                        <x-admin.complaints-images :complaint="$complaint" />
-
-                                        @unless ($isFinal)
-                                            <x-field name="remarks" type="textarea" :value="$complaint->remarks"
-                                                class="textarea textarea-bordered w-full rows-4"
-                                                placeholder="Send a remarks" label="Remarks" />
-                                        @endunless
-
-                                        <div class="space-y-3">
-                                            @if ($complaint->status !== ComplaintStatus::RESOLVED && $complaint->status !== ComplaintStatus::REJECTED)
-                                                <label class="label">
-                                                    <span class="text-xs">Update Status</span>
-                                                </label>
-                                            @endif
-
-                                            @if ($complaint->status === ComplaintStatus::SUBMITTED)
-                                                <label
-                                                    class="flex items-center gap-2 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-info/60 hover:bg-info/5"
-                                                    :class="selectedStatus === 'under_review' ? 'border-info bg-info/5' : 'border-base-300'"
-                                                    @click.prevent="selectedStatus = selectedStatus === 'under_review' ? null : 'under_review'">
-                                                    <input type="radio" name="status" value="under_review"
-                                                        x-model="selectedStatus" class="sr-only">
-                                                    <div
-                                                        class="flex items-center justify-center size-7 rounded-full bg-info/10 text-info shrink-0">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2">
-                                                            <circle cx="11" cy="11" r="7" />
-                                                            <path d="m21 21-4.3-4.3" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class="min-w-0 text-left">
-                                                        <p class="font-semibold text-xs">Mark as Under Review</p>
-                                                        <p class="text-[11px] text-muted-foreground truncate">Start
-                                                            reviewing this complaint</p>
-                                                    </div>
-                                                </label>
-                                            @elseif ($complaint->status === ComplaintStatus::UNDER_REVIEW)
-                                                <div class="grid grid-cols-2 gap-2">
-                                                    <label
-                                                        class="flex flex-col items-start text-left gap-1.5 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-error/60 hover:bg-error/5"
-                                                        :class="selectedStatus === 'rejected' ? 'border-error bg-error/5' : 'border-base-300'"
-                                                        @click.prevent="selectedStatus = selectedStatus === 'rejected' ? null : 'rejected'">
-                                                        <input type="radio" name="status" value="rejected"
-                                                            x-model="selectedStatus" class="sr-only">
-                                                        <div
-                                                            class="flex items-center justify-center size-7 rounded-full bg-error/10 text-error shrink-0">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
-                                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                                stroke-width="2">
-                                                                <path d="M18 6 6 18M6 6l12 12" />
-                                                            </svg>
-                                                        </div>
-                                                        <div class="min-w-0 text-left">
-                                                            <p class="font-semibold text-xs">Reject</p>
-                                                            <p class="text-[11px] text-muted-foreground truncate">
-                                                                Not a valid complaint</p>
-                                                        </div>
-                                                    </label>
-
-                                                    <label
-                                                        class="flex flex-col items-start text-left gap-1.5 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-success/60 hover:bg-success/5"
-                                                        :class="selectedStatus === 'in_progress' ? 'border-success bg-success/5' : 'border-base-300'"
-                                                        @click.prevent="selectedStatus = selectedStatus === 'in_progress' ? null : 'in_progress'">
-                                                        <input type="radio" name="status" value="in_progress"
-                                                            x-model="selectedStatus" class="sr-only">
-                                                        <div
-                                                            class="flex items-center justify-center size-7 rounded-full bg-success/10 text-success shrink-0">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
-                                                                viewBox="0 0 24 24" fill="none"
-                                                                stroke="currentColor" stroke-width="2">
-                                                                <path d="M20 6 9 17l-5-5" />
-                                                            </svg>
-                                                        </div>
-                                                        <div class="min-w-0 text-left">
-                                                            <p class="font-semibold text-xs">Approve</p>
-                                                            <p class="text-[11px] text-muted-foreground truncate">
-                                                                Move to In Progress</p>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                            @elseif ($complaint->status === ComplaintStatus::IN_PROGRESS)
-                                                <label
-                                                    class="flex items-center gap-2 card border-2 cursor-pointer p-2.5 transition-all duration-200 hover:border-success/60 hover:bg-success/5"
-                                                    :class="selectedStatus === 'resolved' ? 'border-success bg-success/5' : 'border-base-300'"
-                                                    @click.prevent="selectedStatus = selectedStatus === 'resolved' ? null : 'resolved'">
-                                                    <input type="radio" name="status" value="resolved"
-                                                        x-model="selectedStatus" class="sr-only">
-                                                    <div
-                                                        class="flex items-center justify-center size-7 rounded-full bg-success/10 text-success shrink-0">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5"
-                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                            stroke-width="2">
-                                                            <path
-                                                                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                        </svg>
-                                                    </div>
-                                                    <div class="min-w-0 text-left">
-                                                        <p class="font-semibold text-xs">Mark as Resolved</p>
-                                                        <p class="text-[11px] text-muted-foreground truncate">This
-                                                            complaint has been addressed</p>
-                                                    </div>
-                                                </label>
-                                            @endif
-
-                                            <div class="grid transition-all duration-300 ease-out" :class="selectedStatus
-                                                ? 'grid-rows-[1fr] opacity-100 mt-2'
-                                                : 'grid-rows-[0fr] opacity-0 mt-0'">
-                                                <div class="overflow-hidden">
-                                                    <x-admin.status-banner />
-                                                </div>
-                                            </div>
+                                @else
+                                    <section class="space-y-2">
+                                        <div class="flex items-center gap-3">
+                                            <h4
+                                                class="text-[11px] font-medium uppercase tracking-wide text-base-content/50">
+                                                Remarks
+                                            </h4>
+                                            <div class="h-px flex-1 bg-base-300/60"></div>
                                         </div>
 
-                                        @if ($complaint->statusHistories->isNotEmpty())
-                                            <div class="pb-2">
-                                                <h4 class="text-sm font-semibold text-base-content/70 mb-3">
-                                                    Status History
-                                                </h4>
-                                                <x-admin.status-timeline :histories="$complaint->statusHistories" />
+                                        <x-field name="remarks" type="textarea" :value="$complaint->remarks" rows="3"
+                                            placeholder="Add a note for the reporter or your team…"
+                                            class="textarea w-full rounded-2xl border-base-300/60 bg-base-100 text-sm leading-relaxed placeholder:text-base-content/40 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/15" />
+                                    </section>
+
+                                    <section class="space-y-2">
+                                        <div class="flex items-center gap-3">
+                                            <h4
+                                                class="text-[11px] font-medium uppercase tracking-wide text-base-content/50">
+                                                Update status
+                                            </h4>
+                                            <div class="h-px flex-1 bg-base-300/60"></div>
+                                            <span class="text-[11px] text-base-content/40">required to save</span>
+                                        </div>
+
+                                        @if ($complaint->status === ComplaintStatus::SUBMITTED)
+                                            <x-admin.status-option value="under_review" color="info"
+                                                title="Mark as Under Review"
+                                                description="Start reviewing this complaint">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="11" cy="11" r="7" />
+                                                    <path d="m21 21-4.3-4.3" />
+                                                </svg>
+                                            </x-admin.status-option>
+                                        @elseif ($complaint->status === ComplaintStatus::UNDER_REVIEW)
+                                            <div class="grid grid-cols-2 gap-2">
+
+                                                <x-admin.status-option value="rejected" color="error" compact
+                                                    title="Reject" description="Not a valid complaint">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M18 6 6 18M6 6l12 12" />
+                                                    </svg>
+                                                </x-admin.status-option>
+
+                                                <x-admin.status-option value="in_progress" color="success" compact
+                                                    title="Approve" description="Move to In Progress">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="size-4"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                        <path d="M20 6 9 17l-5-5" />
+                                                    </svg>
+                                                </x-admin.status-option>
                                             </div>
+                                        @elseif ($complaint->status === ComplaintStatus::IN_PROGRESS)
+                                            <x-admin.status-option value="resolved" color="success"
+                                                title="Mark as Resolved"
+                                                description="This complaint has been addressed">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="size-4"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path
+                                                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                            </x-admin.status-option>
                                         @endif
+
+                                        {{-- Banner (collapses when nothing selected) --}}
+                                        <div class="grid transition-all duration-300 ease-out" :class="selectedStatus
+                                            ? 'grid-rows-[1fr] opacity-100'
+                                            : 'grid-rows-[0fr] opacity-0'">
+                                            <div class="overflow-hidden">
+                                                <x-admin.status-banner />
+                                            </div>
+                                        </div>
+                                    </section>
+                                @endif
+
+                                @if ($complaint->statusHistories->isNotEmpty())
+                                    <div class="pb-2">
+                                        <h4 class="text-sm font-semibold text-base-content/70 mb-3">
+                                            Status History
+                                        </h4>
+                                        <x-admin.status-timeline :histories="$complaint->statusHistories" />
                                     </div>
+                                @endif
 
-                                    <div
-                                        class="sticky bottom-0 z-10 flex w-full items-center justify-end gap-2 border-t border-base-300 bg-base-100 p-6 pt-4">
-
-
-                                        <button type="submit" class="btn flex-1" :class="selectedStatus ? 'btn-primary' : 'btn-disabled'"
-                                            :disabled="!selectedStatus">
-                                            Save changes
-                                        </button>
-                                    </div>
-                                </form>
                             </div>
-                        </div>
-                    </div>
+
+                            {{-- ── Sticky footer ── --}}
+                            @unless ($isFinal)
+                                <div
+                                    class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 border-t border-base-300/60 bg-base-100/90 px-6 py-3 backdrop-blur">
+                                    <p class="text-xs text-base-content/50"
+                                        x-text="selectedStatus ? 'Status will change on save.' : 'Select a status to save changes.'">
+                                    </p>
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-xl px-4"
+                                        :disabled="!selectedStatus" :class="!selectedStatus && 'btn-disabled opacity-60 cursor-not-allowed'">
+                                        Confirm update
+                                    </button>
+                                </div>
+                            @endunless
+                        </form>
+                    </x-admin.drawer>
+
                 </td>
             </tr>
         @empty

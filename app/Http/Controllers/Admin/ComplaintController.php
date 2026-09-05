@@ -47,6 +47,21 @@ class ComplaintController extends Controller
             ->paginate($perPage)
             ->withQueryString(); // keeps ?filter[status]=... etc. on every pagination link automatically
 
+        // NEW: when Alpine's fetch() asks for JSON, return just the table partial + pagination meta
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.complaints._table', [
+                    'complaints' => $complaints,
+                ])->render(),
+                'meta' => [
+                    'from' => $complaints->firstItem(),
+                    'to' => $complaints->lastItem(),
+                    'total' => $complaints->total(),
+                    'last_page' => $complaints->lastPage(),
+                ],
+            ]);
+        }
+
         $categories = ComplaintCategory::all();
         $selectedCategory = $request->input('filter.complaint_category_id');
         $statusCounts = Complaint::allStatusCounts($selectedCategory);
